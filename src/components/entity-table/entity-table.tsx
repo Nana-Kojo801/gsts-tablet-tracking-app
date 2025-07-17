@@ -4,7 +4,13 @@ import { Input } from '../ui/input'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 
-interface EntityTableProps<T, IdType = unknown> {
+export type RenderDataType<T, IdType> = (props: {
+  column: EntityTableProps<T, IdType>['columns'][0]
+  entry: T
+  defaultData: string
+}) => string | React.ReactNode
+
+export interface EntityTableProps<T, IdType = unknown> {
   searchPlaceholder: string
   entries: T[]
   getRowId: (entry: T) => IdType
@@ -17,6 +23,7 @@ interface EntityTableProps<T, IdType = unknown> {
     onEdit: (item: T) => void
     onDelete: (item: T) => void
   }
+  renderData?: RenderDataType<T, IdType>
 }
 
 const EntityTable = <T, IdType = unknown>({
@@ -28,6 +35,7 @@ const EntityTable = <T, IdType = unknown>({
   dataActions,
   searchPlaceholder,
   search,
+  renderData = ({ defaultData }) => defaultData,
 }: EntityTableProps<T, IdType>) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -80,6 +88,7 @@ const EntityTable = <T, IdType = unknown>({
         entries={paginatedEntries}
         columns={columns}
         getRowId={getRowId}
+        renderData={renderData}
       />
 
       {/* Pagination */}

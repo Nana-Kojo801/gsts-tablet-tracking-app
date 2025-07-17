@@ -5,8 +5,9 @@ import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 import StudentDialog from '../system/-components/students/student-dialog'
 import { Button } from '@/components/ui/button'
-import { Plus, Upload } from 'lucide-react'
+import { Plus, TabletIcon, Upload } from 'lucide-react'
 import type { DialogState } from '../system/-components/students/types'
+import { Badge } from '@/components/ui/badge'
 
 export const Route = createFileRoute('/_app/students/')({
   component: StudentsManagement,
@@ -69,6 +70,26 @@ function StudentsManagement() {
           { key: 'tablet', label: 'Tablet' },
           { key: 'status', label: 'Status' },
         ]}
+        renderData={({ column, entry, defaultData }) => {
+          if (column.key === 'tablet') {
+            if (entry.tabletId) {
+              return (
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
+                  <TabletIcon className="w-4 h-4 mr-1 text-green-600" />
+                  Received
+                </Badge>
+              )
+            } else {
+              return (
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-muted/40 border-border text-muted-foreground">
+                  <span className="w-4 h-4 mr-1">—</span>
+                  Not Received
+                </Badge>
+              )
+            }
+          }
+          return defaultData
+        }}
         search={(searchQuery, entry) =>
           entry.name.toLowerCase().includes(searchQuery.toLowerCase())
         }

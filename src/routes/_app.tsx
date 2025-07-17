@@ -4,6 +4,7 @@ import {
   fetchClassesQueryOptions,
   fetchProgrammesQueryOptions,
   fetchStudentsQueryOptions,
+  fetchSubmissionsQueryOptions,
   fetchTabletsQueryOptions,
   fetchUsersQueryOptions,
 } from '@/queries'
@@ -20,6 +21,7 @@ export const Route = createFileRoute('/_app')({
       queryClient.ensureQueryData(fetchProgrammesQueryOptions()),
       queryClient.ensureQueryData(fetchTabletsQueryOptions()),
       queryClient.ensureQueryData(fetchUsersQueryOptions()),
+      queryClient.ensureQueryData(fetchSubmissionsQueryOptions())
     ])
   },
 })

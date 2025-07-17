@@ -38,9 +38,9 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
   const initialTabletImei = useMemo(() => {
     if (type === 'edit' && studentObj?.tabletId) {
       const found = tablets.find((t: any) => t._id === studentObj.tabletId)
-      return found ? found.imei : ''
+      return found ? found.imei : undefined
     }
-    return ''
+    return undefined
   }, [type, studentObj, tablets])
   const [tabletSearch, setTabletSearch] = useState(initialTabletImei)
   const [showTabletDropdown, setShowTabletDropdown] = useState(false)
@@ -115,15 +115,15 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
   // On blur, if the IMEI is not in the list, clear the field
   const handleTabletBlur = (field: any) => {
     if (!tabletSearch) {
-      field.onChange('')
-      setTabletSearch('')
+      field.onChange(undefined)
+      setTabletSearch(undefined)
       setShowTabletDropdown(false)
       return
     }
     const found = tablets.find((t: any) => t.imei === tabletSearch)
     if (!found) {
-      field.onChange('')
-      setTabletSearch('')
+      field.onChange(undefined)
+      setTabletSearch(undefined)
     }
     setShowTabletDropdown(false)
   }
@@ -237,18 +237,19 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                   </span>
                   <Input
                     placeholder="Type tablet IMEI"
-                    value={tabletSearch}
+                    value={tabletSearch ?? ''}
                     onChange={(e) => {
-                      setTabletSearch(e.target.value)
+                      const val = e.target.value
+                      setTabletSearch(val === '' ? undefined : val)
                       setShowTabletDropdown(true)
                       // Only set the value if the IMEI matches a tablet
-                      const found = tablets.find(
-                        (t: any) => t.imei === e.target.value,
-                      )
+                      const found = tablets.find((t: any) => t.imei === val)
                       if (found) {
                         field.onChange(found._id)
+                      } else if (val === '') {
+                        field.onChange(undefined)
                       } else {
-                        field.onChange('')
+                        field.onChange(undefined)
                       }
                     }}
                     onFocus={() => setShowTabletDropdown(true)}

@@ -43,3 +43,11 @@ export const fetchUsersQueryOptions = () => {
         initialData: []
     })
 }
+
+export const fetchSubmissionsQueryOptions = () => {
+    return queryOptions({
+        ...convexQuery(api.submissions.getAll, {}),
+        gcTime: GC_TIME,
+        initialData: []
+    })
+}

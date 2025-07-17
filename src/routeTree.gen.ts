@@ -14,10 +14,10 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppSystemIndexRouteImport } from './routes/_app/system/index'
+import { Route as AppSubmissionsIndexRouteImport } from './routes/_app/submissions/index'
 import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
-import { Route as AppCollectionIndexRouteImport } from './routes/_app/collection/index'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -43,6 +43,11 @@ const AppSystemIndexRoute = AppSystemIndexRouteImport.update({
   path: '/system/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSubmissionsIndexRoute = AppSubmissionsIndexRouteImport.update({
+  id: '/submissions/',
+  path: '/submissions/',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppStudentsIndexRoute = AppStudentsIndexRouteImport.update({
   id: '/students/',
   path: '/students/',
@@ -58,30 +63,25 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCollectionIndexRoute = AppCollectionIndexRouteImport.update({
-  id: '/collection/',
-  path: '/collection/',
-  getParentRoute: () => AppRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
-  '/collection': typeof AppCollectionIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
+  '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
-  '/collection': typeof AppCollectionIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
+  '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
 }
 export interface FileRoutesById {
@@ -90,10 +90,10 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/collection/': typeof AppCollectionIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/students/': typeof AppStudentsIndexRoute
+  '/_app/submissions/': typeof AppSubmissionsIndexRoute
   '/_app/system/': typeof AppSystemIndexRoute
 }
 export interface FileRouteTypes {
@@ -102,20 +102,20 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/'
-    | '/collection'
     | '/reports'
     | '/settings'
     | '/students'
+    | '/submissions'
     | '/system'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/register'
     | '/'
-    | '/collection'
     | '/reports'
     | '/settings'
     | '/students'
+    | '/submissions'
     | '/system'
   id:
     | '__root__'
@@ -123,10 +123,10 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_app/'
-    | '/_app/collection/'
     | '/_app/reports/'
     | '/_app/settings/'
     | '/_app/students/'
+    | '/_app/submissions/'
     | '/_app/system/'
   fileRoutesById: FileRoutesById
 }
@@ -173,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppSystemIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/submissions/': {
+      id: '/_app/submissions/'
+      path: '/submissions'
+      fullPath: '/submissions'
+      preLoaderRoute: typeof AppSubmissionsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/students/': {
       id: '/_app/students/'
       path: '/students'
@@ -194,31 +201,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/collection/': {
-      id: '/_app/collection/'
-      path: '/collection'
-      fullPath: '/collection'
-      preLoaderRoute: typeof AppCollectionIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
-  AppCollectionIndexRoute: typeof AppCollectionIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppStudentsIndexRoute: typeof AppStudentsIndexRoute
+  AppSubmissionsIndexRoute: typeof AppSubmissionsIndexRoute
   AppSystemIndexRoute: typeof AppSystemIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
-  AppCollectionIndexRoute: AppCollectionIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppStudentsIndexRoute: AppStudentsIndexRoute,
+  AppSubmissionsIndexRoute: AppSubmissionsIndexRoute,
   AppSystemIndexRoute: AppSystemIndexRoute,
 }
 

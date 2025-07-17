@@ -1,5 +1,6 @@
 import { Button } from '../ui/button'
 import { Edit, Trash2 } from 'lucide-react'
+import type { RenderDataType } from './entity-table'
 
 type DataTableProps<T, IdType = unknown> = {
   entries: T[]
@@ -7,6 +8,7 @@ type DataTableProps<T, IdType = unknown> = {
   columns: { key: keyof T; label: string }[]
   onEdit: (classObj: T) => void
   onDelete: (classObj: T) => void
+  renderData: RenderDataType<T, IdType>
 }
 
 const DataTable = <T, IdType = unknown>({
@@ -15,6 +17,7 @@ const DataTable = <T, IdType = unknown>({
   getRowId,
   onEdit,
   onDelete,
+  renderData,
 }: DataTableProps<T, IdType>) => {
   return (
     <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg">
@@ -22,7 +25,7 @@ const DataTable = <T, IdType = unknown>({
         <table className="w-full min-w-[500px]">
           <thead>
             <tr className="bg-gradient-to-r from-muted/80 via-muted/60 to-muted/80 border-b border-border/50">
-              {columns.map(column => (
+              {columns.map((column) => (
                 <th key={String(column.key)} className="px-4 py-3 text-left">
                   <span className="font-semibold text-foreground text-sm uppercase tracking-wide">
                     {column.label}
@@ -42,9 +45,16 @@ const DataTable = <T, IdType = unknown>({
                 key={String(getRowId(entry))}
                 className={`hover:bg-muted/40 transition-all duration-200 ${index % 2 === 0 ? 'bg-muted/10' : 'bg-transparent'}`}
               >
-                {columns.map(col => (
-                  <td key={String(col.key)} className="px-4 py-3 font-semibold text-foreground text-sm">
-                    {String(entry[col.key])}
+                {columns.map((col) => (
+                  <td
+                    key={String(col.key)}
+                    className="px-4 py-3 font-semibold text-foreground text-sm"
+                  >
+                    {renderData({
+                      column: col,
+                      entry,
+                      defaultData: String(entry[col.key]),
+                    })}
                   </td>
                 ))}
                 <td className="px-4 py-3">

@@ -4,6 +4,8 @@ import type { DialogState } from './types'
 import TabletDialog from './tablet-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
+import { Badge } from '@/components/ui/badge'
+import { Check, AlertTriangle } from 'lucide-react'
 
 const TabletsTab = () => {
   const { tablets } = useAppData()
@@ -37,6 +39,26 @@ const TabletsTab = () => {
           { key: 'imei', label: 'IMEI' },
           { key: 'status', label: 'Status' },
         ]}
+        renderData={({ column, entry, defaultData }) => {
+          if (column.key === 'status') {
+            if (entry.status === 'active') {
+              return (
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
+                  <Check className="w-4 h-4 mr-1 text-green-600" />
+                  Active
+                </Badge>
+              )
+            } else if (entry.status === 'lost') {
+              return (
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-red-500/10 border-red-500 text-red-700">
+                  <AlertTriangle className="w-4 h-4 mr-1 text-red-600" />
+                  Lost
+                </Badge>
+              )
+            }
+          }
+          return defaultData
+        }}
         search={(searchQuery, entry) =>
           entry.imei.toLowerCase().includes(searchQuery.toLowerCase())
         }

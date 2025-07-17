@@ -4,6 +4,7 @@ import {
   fetchProgrammesQueryOptions,
   fetchClassesQueryOptions,
   fetchTabletsQueryOptions,
+  fetchSubmissionsQueryOptions,
 } from '@/queries'
 import { useSuspenseQueries } from '@tanstack/react-query'
 
@@ -14,6 +15,7 @@ export const useAppData = () => {
     { data: programmes },
     { data: classes },
     { data: tablets },
+    { data: submissions }
   ] = useSuspenseQueries({
     queries: [
       fetchUsersQueryOptions(),
@@ -21,6 +23,7 @@ export const useAppData = () => {
       fetchProgrammesQueryOptions(),
       fetchClassesQueryOptions(),
       fetchTabletsQueryOptions(),
+      fetchSubmissionsQueryOptions()
     ],
   })
 
@@ -30,5 +33,10 @@ export const useAppData = () => {
     programmes,
     classes,
     tablets,
+    submissions: submissions.map(submission => {
+      const student = students.find(s => s._id === submission.studentId)!
+      const user = users.find(u => u._id === submission.receivedById)!
+      return { ...submission, student, receivedBy: user }
+    })
   }
 }

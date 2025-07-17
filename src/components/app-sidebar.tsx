@@ -15,7 +15,7 @@ import { useUser } from '@/hooks/user-user'
 const navigationItems = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
   { name: 'Students', icon: Users, href: '/students' },
-  { name: 'Collection', icon: Tablet, href: '/collection' },
+  { name: 'Submissions', icon: Tablet, href: '/submissions' },
   { name: 'Reports', icon: BarChart3, href: '/reports' },
   { name: 'Settings', icon: Settings, href: '/settings' },
   { name: 'System', icon: Monitor, href: '/system' },
