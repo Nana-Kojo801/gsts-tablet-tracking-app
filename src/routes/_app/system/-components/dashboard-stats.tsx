@@ -1,9 +1,11 @@
-import { Monitor, Tablet, User, Users } from 'lucide-react'
-import { classes, students, tablets, users } from '../-mock-data'
+import { Book, Monitor, Tablet, User, Users } from 'lucide-react'
+import { useAppData } from '@/hooks/use-app-data'
 
 const DashboardStats = () => {
+  const { classes, students, tablets, users, programmes } = useAppData()
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-6 mb-8">
       <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-lg flex items-center justify-between">
         <div>
           <div className="text-sm font-medium text-muted-foreground">
@@ -41,6 +43,17 @@ const DashboardStats = () => {
         </div>
         <div className="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center">
           <Tablet className="w-6 h-6 text-purple-600" />
+        </div>
+      </div>
+      <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-lg flex items-center justify-between">
+        <div>
+          <div className="text-sm font-medium text-muted-foreground">Programmes</div>
+          <div className="text-2xl font-bold text-foreground">
+            {programmes.length}
+          </div>
+        </div>
+        <div className="w-12 h-12 bg-yellow-500/10 rounded-lg flex items-center justify-center">
+          <Book className="w-6 h-6 text-yellow-600" />
         </div>
       </div>
       <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-lg flex items-center justify-between">

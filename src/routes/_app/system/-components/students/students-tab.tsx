@@ -1,20 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import type { Student } from '@/types'
+import type { DialogState } from './types'
+import StudentDialog from './student-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
-import StudentDialog from '../system/-components/students/student-dialog'
-import { Button } from '@/components/ui/button'
-import { Plus, Upload } from 'lucide-react'
-import type { DialogState } from '../system/-components/students/types'
 
-export const Route = createFileRoute('/_app/students/')({
-  component: StudentsManagement,
-})
-
-function StudentsManagement() {
+const StudentsTab = () => {
   const { students } = useAppData()
-
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     action: null,
@@ -33,29 +25,7 @@ function StudentsManagement() {
   }
 
   return (
-    <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-4">
-      {/* Page Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-foreground">
-            Student Management
-          </h1>
-          <p className="text-muted-foreground">
-            Manage robotics club students and their tablet assignments
-          </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" className="flex items-center space-x-2">
-            <Upload className="w-4 h-4" />
-            <span>Import Students</span>
-          </Button>
-          <Button className="flex items-center space-x-2">
-            <Plus className="w-4 h-4" />
-            <span>Add Student</span>
-          </Button>
-        </div>
-      </div>
-
+    <div>
       <EntityTable<Student>
         searchPlaceholder="Search students..."
         entries={students}
@@ -67,7 +37,7 @@ function StudentsManagement() {
           { key: 'programme', label: 'Programme' },
           { key: 'class', label: 'Class' },
           { key: 'tablet', label: 'Tablet' },
-          { key: 'status', label: 'Status' },
+          { key: 'status', label: 'Status' }
         ]}
         search={(searchQuery, entry) =>
           entry.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -78,8 +48,9 @@ function StudentsManagement() {
           onDelete: (item) => openDialog('delete', item),
         }}
       />
-
       <StudentDialog dialogState={dialogState} closeDialog={closeDialog} />
     </div>
   )
 }
+
+export default StudentsTab 

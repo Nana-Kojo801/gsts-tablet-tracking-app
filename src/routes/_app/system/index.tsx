@@ -3,17 +3,14 @@ import { useState } from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Users, Tablet, Monitor, User } from 'lucide-react'
 import DashboardStats from './-components/dashboard-stats'
-import StudentsTab from './-components/students-tab'
-import ClassesTab from './-components/classes-tab'
-import TabletsTab from './-components/tablets-tab'
-import UsersTab from './-components/users-tab'
-import { fetchClassesQueryOptions } from './-queries'
+import ClassesTab from './-components/classes/classes-tab'
+import StudentsTab from './-components/students/students-tab'
+import TabletsTab from './-components/tablets/tablets-tab'
+import UsersTab from './-components/users/users-tab'
+import ProgrammesTab from './-components/programmes/programmes-tab'
 
 export const Route = createFileRoute('/_app/system/')({
   component: RouteComponent,
-  loader: ({ context: { queryClient }}) => {
-    queryClient.prefetchQuery(fetchClassesQueryOptions())
-  }
 })
 
 function RouteComponent() {
@@ -22,8 +19,12 @@ function RouteComponent() {
     <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-8">
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-foreground">System Management</h1>
-          <p className="text-muted-foreground">Manage students, classes, tablets, and users</p>
+          <h1 className="text-3xl font-bold text-foreground">
+            System Management
+          </h1>
+          <p className="text-muted-foreground">
+            Manage students, classes, tablets, and users
+          </p>
         </div>
       </div>
       {/* Dashboard Stats */}
@@ -31,10 +32,33 @@ function RouteComponent() {
 
       <Tabs value={tab} onValueChange={setTab} className="w-full">
         <TabsList className="w-full flex gap-2 mb-4 h-10">
-          <TabsTrigger value="students" className="flex-1 flex items-center gap-2"><Users className="w-4 h-4" /> Students</TabsTrigger>
-          <TabsTrigger value="classes" className="flex-1 flex items-center gap-2"><User className="w-4 h-4" /> Classes</TabsTrigger>
-          <TabsTrigger value="tablets" className="flex-1 flex items-center gap-2"><Tablet className="w-4 h-4" /> Tablets</TabsTrigger>
-          <TabsTrigger value="users" className="flex-1 flex items-center gap-2"><Monitor className="w-4 h-4" /> Users</TabsTrigger>
+          <TabsTrigger
+            value="students"
+            className="flex-1 flex items-center gap-2"
+          >
+            <Users className="w-4 h-4" /> Students
+          </TabsTrigger>
+          <TabsTrigger
+            value="classes"
+            className="flex-1 flex items-center gap-2"
+          >
+            <User className="w-4 h-4" /> Classes
+          </TabsTrigger>
+          <TabsTrigger
+            value="tablets"
+            className="flex-1 flex items-center gap-2"
+          >
+            <Tablet className="w-4 h-4" /> Tablets
+          </TabsTrigger>
+          <TabsTrigger
+            value="programmes"
+            className="flex-1 flex items-center gap-2"
+          >
+            <Monitor className="w-4 h-4" /> Programmes
+          </TabsTrigger>
+          <TabsTrigger value="users" className="flex-1 flex items-center gap-2">
+            <Monitor className="w-4 h-4" /> Users
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="students">
@@ -48,7 +72,11 @@ function RouteComponent() {
         <TabsContent value="tablets">
           <TabletsTab />
         </TabsContent>
-        
+
+        <TabsContent value="programmes">
+          <ProgrammesTab />
+        </TabsContent>
+
         <TabsContent value="users">
           <UsersTab />
         </TabsContent>

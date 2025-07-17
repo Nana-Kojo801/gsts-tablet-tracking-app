@@ -1,10 +1,26 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import AppSidebar from '@/components/app-sidebar'
+import {
+  fetchClassesQueryOptions,
+  fetchProgrammesQueryOptions,
+  fetchStudentsQueryOptions,
+  fetchTabletsQueryOptions,
+  fetchUsersQueryOptions,
+} from '@/queries'
 
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
   beforeLoad: ({ context }) => {
     if (!context.user) throw redirect({ to: '/login' })
+  },
+  loader: async ({ context: { queryClient } }) => {
+    await Promise.all([
+      queryClient.ensureQueryData(fetchClassesQueryOptions()),
+      queryClient.ensureQueryData(fetchStudentsQueryOptions()),
+      queryClient.ensureQueryData(fetchProgrammesQueryOptions()),
+      queryClient.ensureQueryData(fetchTabletsQueryOptions()),
+      queryClient.ensureQueryData(fetchUsersQueryOptions()),
+    ])
   },
 })
 
