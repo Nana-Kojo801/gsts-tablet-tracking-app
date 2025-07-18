@@ -10,7 +10,7 @@ import {
   Monitor,
 } from 'lucide-react'
 import { Button } from './ui/button'
-import { Link } from '@tanstack/react-router'
+import { Link, redirect } from '@tanstack/react-router'
 import { useUser } from '@/hooks/user-user'
 import Logo from '@/logo.png'
 
@@ -98,7 +98,10 @@ const AppSidebar = () => {
               {user.role === 'admin' ? 'Admin' : 'User'}
             </div>
           </div>
-          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+          <Button onClick={() => {
+            localStorage.setItem("session-userId", String(null))
+            throw redirect({ to: '/login' })
+          }} variant="ghost" size="sm" className="h-8 w-8 p-0">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
