@@ -139,7 +139,7 @@ function RouteComponent() {
 
               <Button
                 type="submit"
-                className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+                className="w-full h-12 font-semibold"
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? <Spinner /> : 'Login'}
