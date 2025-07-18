@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AppSystemIndexRouteImport } from './routes/_app/system/index'
 import { Route as AppSubmissionsIndexRouteImport } from './routes/_app/submissions/index'
@@ -29,11 +28,6 @@ const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppRoute,
-} as any)
-const AuthRegisterRoute = AuthRegisterRouteImport.update({
-  id: '/_auth/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/_auth/login',
@@ -79,7 +73,6 @@ const AppReportsRecentActivtiesIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/distributions': typeof AppDistributionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
@@ -91,7 +84,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
-  '/register': typeof AuthRegisterRoute
   '/': typeof AppIndexRoute
   '/distributions': typeof AppDistributionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
@@ -105,7 +97,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
-  '/_auth/register': typeof AuthRegisterRoute
   '/_app/': typeof AppIndexRoute
   '/_app/distributions/': typeof AppDistributionsIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
@@ -119,7 +110,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
-    | '/register'
     | '/'
     | '/distributions'
     | '/reports'
@@ -131,7 +121,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
-    | '/register'
     | '/'
     | '/distributions'
     | '/reports'
@@ -144,7 +133,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth/login'
-    | '/_auth/register'
     | '/_app/'
     | '/_app/distributions/'
     | '/_app/reports/'
@@ -158,7 +146,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthLoginRoute: typeof AuthLoginRoute
-  AuthRegisterRoute: typeof AuthRegisterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -176,13 +163,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
-    }
-    '/_auth/register': {
-      id: '/_auth/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof AuthRegisterRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/_auth/login': {
       id: '/_auth/login'
@@ -270,7 +250,6 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthLoginRoute: AuthLoginRoute,
-  AuthRegisterRoute: AuthRegisterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
