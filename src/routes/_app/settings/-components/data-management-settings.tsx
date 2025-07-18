@@ -97,13 +97,13 @@ export function DataManagementSettings() {
               <Download className="w-4 h-4" />
               <span>Export Data</span>
             </Button>
-            <p className="text-xs text-muted-foreground mt-1 ml-1">
+            <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
               Exports all app data as a <b>JSON</b> file. The exported file will
               contain objects for <code>students</code>, <code>tablets</code>,{' '}
               <code>submissions</code>, <code>distributions</code>,{' '}
               <code>classes</code>, and <code>programmes</code>.<br />
               <span className="text-muted-foreground">Example:</span>
-              <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs">
+              <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs whitespace-pre-wrap break-words max-w-full">
                 {'{'}
                 "students": [...], "tablets": [...], "submissions": [...],
                 "distributions": [...], "classes": [...], "programmes": [...]
@@ -123,7 +123,7 @@ export function DataManagementSettings() {
                   <Upload className="w-4 h-4" />
                   <span>Master Import</span>
                 </Button>
-                <p className="text-xs text-muted-foreground mt-1 ml-1">
+                <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
                   Import a master Excel (.xlsx) file of students. This will
                   automatically create any missing <b>programmes</b>,{' '}
                   <b>classes</b>, and <b>tablets</b> referenced in the file, and
