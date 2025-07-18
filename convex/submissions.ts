@@ -1,6 +1,5 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
-import { getAllSubmissionProps } from './models/submissions/helpers'
 import { submissionCondition } from './shared/validators'
 
 export const getAll = query({

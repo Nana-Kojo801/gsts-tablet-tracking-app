@@ -1,4 +1,4 @@
-import { QueryCtx } from '../../_generated/server'
+import { type QueryCtx } from '../../_generated/server'
 
 export const generateUserPassword = () => {
   return Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join(
