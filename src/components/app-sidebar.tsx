@@ -8,11 +8,15 @@ import {
   User,
   LogOut,
   Monitor,
+  PanelLeft,
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link, redirect } from '@tanstack/react-router'
 import { useUser } from '@/hooks/user-user'
 import Logo from '@/logo.png'
+import { useIsMobile } from '@/hooks/use-mobile'
+import * as React from 'react'
+import { Sheet, SheetContent } from '@/components/ui/sheet'
 
 const navigationItems = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
@@ -26,11 +30,12 @@ const navigationItems = [
 
 const AppSidebar = () => {
   const user = useUser()
+  const isMobile = useIsMobile()
+  const [open, setOpen] = React.useState(false)
 
-  return (
-    <div
-      className={`w-65 bg-card/80 backdrop-blur-xl border-r border-border/50 transition-all duration-300 flex flex-col shadow-xl`}
-    >
+  // Sidebar content as a function for reuse
+  const sidebarContent = (
+    <>
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center space-x-3">
@@ -51,7 +56,7 @@ const AppSidebar = () => {
       <nav className="flex-1 p-4 space-y-2">
         {navigationItems.map((item) => {
           const IconComponent = item.icon
-          if (item.name === 'System' && user.role === 'user') return
+          if (item.name === 'System' && user.role === 'user') return null
           return (
             <Link
               to={item.href}
@@ -64,6 +69,7 @@ const AppSidebar = () => {
                 className: 'block',
                 style: { textDecoration: 'none' },
               }}
+              onClick={() => setOpen(false)}
             >
               {({ isActive }) => (
                 <div
@@ -99,13 +105,49 @@ const AppSidebar = () => {
             </div>
           </div>
           <Button onClick={() => {
-            localStorage.setItem("session-userId", String(null))
+            localStorage.removeItem("session-userId")
             throw redirect({ to: '/login' })
           }} variant="ghost" size="sm" className="h-8 w-8 p-0">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
       </div>
+    </>
+  )
+
+  if (isMobile) {
+    // Hamburger menu for mobile
+    return (
+      <>
+        <div className="fixed top-0 left-0 right-0 z-40 h-14 bg-card/90 border-b border-border/50 flex items-center px-2 shadow-xl backdrop-blur-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mr-2"
+            onClick={() => setOpen(true)}
+            aria-label="Open sidebar menu"
+          >
+            <PanelLeft className="w-7 h-7" />
+          </Button>
+          <span className="text-lg font-bold text-foreground ml-2">GSTS</span>
+        </div>
+        <Sheet open={open} onOpenChange={setOpen}>
+          <SheetContent side="left" className="p-0 w-64 max-w-full">
+            <div className="h-full flex flex-col">{sidebarContent}</div>
+          </SheetContent>
+        </Sheet>
+        {/* Add top padding to main content so it's not hidden behind the bar */}
+        <div className="h-14" />
+      </>
+    )
+  }
+
+  // Desktop sidebar (fixed, full height)
+  return (
+    <div
+      className={`fixed left-0 top-0 bottom-0 h-screen w-65 bg-card/80 backdrop-blur-xl border-r border-border/50 transition-all duration-300 flex flex-col shadow-xl z-30`}
+    >
+      {sidebarContent}
     </div>
   )
 }

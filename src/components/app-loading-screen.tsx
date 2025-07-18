@@ -10,7 +10,7 @@ const AppLoadingScreen = () => {
       </div>
       {/* Logo */}
       <div className="relative z-10 flex flex-col items-center">
-        <img src={Logo} alt="GSTS Logo" className="w-24 h-24 mb-6 drop-shadow-xl animate-fade-in" />
+        <img src={Logo} alt="GSTS Logo" className="w-24 h-24 mb-6 rounded-xl drop-shadow-xl animate-fade-in" />
         {/* Spinner */}
         <div className="w-12 h-12 mb-4 relative flex items-center justify-center">
           <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin" />

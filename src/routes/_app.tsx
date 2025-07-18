@@ -9,6 +9,7 @@ import {
   fetchUsersQueryOptions,
 } from '@/queries'
 import AppLoadingScreen from '@/components/app-loading-screen'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 export const Route = createFileRoute('/_app')({
   pendingComponent: AppLoadingScreen,
@@ -29,15 +30,22 @@ export const Route = createFileRoute('/_app')({
 })
 
 function AppLayout() {
+  const isMobile = useIsMobile()
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-background via-background to-muted/20 flex flex-col md:flex-row">
-      {/* Sidebar */}
+    <div className="w-full min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
+      {/* Sidebar (fixed) */}
       <AppSidebar />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div
+        className={
+          isMobile
+            ? 'flex flex-col'
+            : 'flex flex-col' + ' pl-65' // padding left for sidebar width
+        }
+      >
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 overflow-auto bg-gradient-to-br from-background via-background to-muted/10">
+        <main className="flex-1 p-4 sm:p-6 overflow-auto bg-gradient-to-br from-background via-background to-muted/10 min-h-screen">
           <Outlet />
         </main>
       </div>
