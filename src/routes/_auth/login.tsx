@@ -1,6 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
-import Spinner from '@/components/spinner'
 import { useConvex } from 'convex/react'
 import { api } from '@convex/_generated/api'
 import { toast } from 'sonner'
@@ -142,7 +141,7 @@ function RouteComponent() {
                 className="w-full h-12 font-semibold"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? <Spinner /> : 'Login'}
+                {form.formState.isSubmitting ? 'Logging in...' : 'Login'}
               </Button>
             </form>
           </Form>
