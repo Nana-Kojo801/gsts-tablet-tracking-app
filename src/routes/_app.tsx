@@ -8,11 +8,9 @@ import {
   fetchTabletsQueryOptions,
   fetchUsersQueryOptions,
 } from '@/queries'
-import AppLoadingScreen from '@/components/app-loading-screen'
 import { useIsMobile } from '@/hooks/use-mobile'
 
 export const Route = createFileRoute('/_app')({
-  pendingComponent: AppLoadingScreen,
   component: AppLayout,
   beforeLoad: ({ context }) => {
     if (!context.user) throw redirect({ to: '/login' })

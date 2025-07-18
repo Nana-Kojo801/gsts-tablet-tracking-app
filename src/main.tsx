@@ -10,7 +10,6 @@ import { routeTree } from './routeTree.gen'
 import './styles.css'
 import reportWebVitals from './reportWebVitals.ts'
 import NotFound from './components/not-found.tsx'
-import AppLoadingScreen from './components/app-loading-screen.tsx'
 import { ThemeProvider } from './components/theme-provider.tsx'
 
 // Create a new router instance
@@ -24,7 +23,6 @@ const router = createRouter({
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
   defaultNotFoundComponent: NotFound,
-  defaultPendingComponent: AppLoadingScreen,
 })
 
 // Register the router instance for type safety
