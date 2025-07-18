@@ -11,7 +11,7 @@ import {
   PanelLeft,
 } from 'lucide-react'
 import { Button } from './ui/button'
-import { Link, redirect } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { useUser } from '@/hooks/user-user'
 import Logo from '@/logo.png'
 import { useIsMobile } from '@/hooks/use-mobile'
@@ -32,6 +32,7 @@ const AppSidebar = () => {
   const user = useUser()
   const isMobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
+  const navigate = useNavigate()
 
   // Sidebar content as a function for reuse
   const sidebarContent = (
@@ -106,7 +107,7 @@ const AppSidebar = () => {
           </div>
           <Button onClick={() => {
             localStorage.removeItem("session-userId")
-            throw redirect({ to: '/login' })
+            navigate({ to: '/login' })
           }} variant="ghost" size="sm" className="h-8 w-8 p-0">
             <LogOut className="w-4 h-4" />
           </Button>
