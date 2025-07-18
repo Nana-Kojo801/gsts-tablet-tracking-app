@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
-import { useCreateUserMutation, useEditUserMutation } from '../-mutations'
+import { useCreateUserMutation, useEditUserMutation } from '@/mutations'
 import type { User } from '@/types'
 
 interface UserFormProps {

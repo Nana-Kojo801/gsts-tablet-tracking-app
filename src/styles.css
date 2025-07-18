@@ -61,13 +61,13 @@ code {
   --card-foreground: oklch(0.98 0.01 15);
   --popover: oklch(0.19 0.015 15);
   --popover-foreground: oklch(0.98 0.01 15);
-  --primary: oklch(0.6 0.19 15); /* Vivid burgundy */
+  --primary: oklch(0.45 0.15 20); /* Deep burgundy, less pink in dark mode */
   --primary-foreground: oklch(0.98 0.01 15);
   --secondary: oklch(0.28 0.04 15); /* Slightly lighter for contrast */
   --secondary-foreground: oklch(0.98 0.01 15);
   --muted: oklch(0.23 0.01 15); /* More neutral muted, lighter */
   --muted-foreground: oklch(0.8 0.02 15);
-  --accent: oklch(0.82 0.13 80); /* Bright gold accent */
+  --accent: oklch(0.7 0.08 15 / 0.5); /* Lighter, more transparent version of primary */
   --accent-foreground: oklch(0.19 0.015 15);
   --destructive: oklch(0.7 0.22 25); /* Vibrant red */
   --destructive-foreground: oklch(0.98 0.01 15);

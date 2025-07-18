@@ -14,7 +14,10 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as classes from "../classes.js";
+import type * as data from "../data.js";
+import type * as distributions from "../distributions.js";
 import type * as models_classes_classTable from "../models/classes/classTable.js";
+import type * as models_distributions_distributionTable from "../models/distributions/distributionTable.js";
 import type * as models_programmes_programmeTable from "../models/programmes/programmeTable.js";
 import type * as models_students_helpers from "../models/students/helpers.js";
 import type * as models_students_studentTable from "../models/students/studentTable.js";
@@ -40,7 +43,10 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   classes: typeof classes;
+  data: typeof data;
+  distributions: typeof distributions;
   "models/classes/classTable": typeof models_classes_classTable;
+  "models/distributions/distributionTable": typeof models_distributions_distributionTable;
   "models/programmes/programmeTable": typeof models_programmes_programmeTable;
   "models/students/helpers": typeof models_students_helpers;
   "models/students/studentTable": typeof models_students_studentTable;

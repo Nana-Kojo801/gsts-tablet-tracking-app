@@ -1,4 +1,4 @@
-import Logo from '@/gsts-logo-removebg-preview.svg'
+import Logo from '@/logo.png'
 
 const AppLoadingScreen = () => {
   return (

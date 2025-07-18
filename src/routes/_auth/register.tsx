@@ -58,7 +58,7 @@ function RouteComponent() {
     },
   })
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-2 sm:p-4 relative overflow-hidden">
       {/* Password Dialog */}
       <Dialog
         open={userPassword !== null}
@@ -91,8 +91,8 @@ function RouteComponent() {
         </DialogContent>
       </Dialog>
       {/* School Logo Watermark Background */}
-      <div className="absolute inset-0 opacity-5 flex items-center justify-center">
-        <div className="text-9xl font-bold text-primary rotate-12">GSTS</div>
+      <div className="absolute inset-0 opacity-5 flex items-center justify-center pointer-events-none select-none">
+        <div className="text-6xl sm:text-9xl font-bold text-primary rotate-12">GSTS</div>
       </div>
 
       {/* Main Register Content */}
@@ -101,10 +101,10 @@ function RouteComponent() {
         <div className="space-y-4 text-center mb-8">
           <div className="space-y-2">
             <h1 className="text-2xl font-bold text-foreground">
-              Register for GSTS Tablet Tracker Pro
+              GSTS Tablet Tracker Pro
             </h1>
             <p className="text-muted-foreground">
-              Create your account to access the tablet management system
+              Register to access the tablet management system
             </p>
           </div>
         </div>

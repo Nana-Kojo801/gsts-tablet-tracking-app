@@ -5,8 +5,6 @@ import type { DialogState } from './-components/types'
 import SubmissionDialog from './-components/submission-dialog'
 import SubmissionsTable from './-components/submissions-table'
 import DashboardStats from './-components/dashboard-stats'
-import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
 
 export const Route = createFileRoute('/_app/submissions/')({
   component: SubmissionsPage,
@@ -21,7 +19,7 @@ function SubmissionsPage() {
 
   // Helper functions
   const openDialog = (
-    action: 'add' | 'edit' | 'delete',
+    action: 'add' | 'delete',
     submissionObj: Submissions | null = null,
   ) => {
     setDialogState({ open: true, action, submissionObj })
@@ -31,22 +29,16 @@ function SubmissionsPage() {
   }
 
   return (
-    <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-4">
+    <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-6 p-2 sm:p-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-foreground">
-            Tablet Collection
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+            Tablet Submissions
           </h1>
           <p className="text-muted-foreground">
             Manage and record tablet collections and submissions for students and classes
           </p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <Button className="flex items-center space-x-2" onClick={() => openDialog('add')}>
-            <Plus className="w-4 h-4" />
-            <span>Record Submission</span>
-          </Button>
         </div>
       </div>
 
@@ -54,11 +46,12 @@ function SubmissionsPage() {
       <DashboardStats />
 
       {/* Submissions Table */}
-      <SubmissionsTable 
-        onAdd={() => openDialog('add')}
-        onEdit={(item) => openDialog('edit', item)}
-        onDelete={(item) => openDialog('delete', item)}
-      />
+      <div className="overflow-x-auto">
+        <SubmissionsTable 
+          onAdd={() => openDialog('add')}
+          onDelete={(item) => openDialog('delete', item)}
+        />
+      </div>
 
       {/* Submission Dialog */}
       <SubmissionDialog dialogState={dialogState} closeDialog={closeDialog} />

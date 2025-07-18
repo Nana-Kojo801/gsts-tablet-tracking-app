@@ -1,13 +1,13 @@
 import { Button } from '../ui/button'
 import { Edit, Trash2 } from 'lucide-react'
-import type { RenderDataType } from './entity-table'
+import type { EntityTableProps, RenderDataType } from './entity-table'
 
 type DataTableProps<T, IdType = unknown> = {
   entries: T[]
   getRowId: (entry: T) => IdType
-  columns: { key: keyof T; label: string }[]
-  onEdit: (classObj: T) => void
-  onDelete: (classObj: T) => void
+  columns: EntityTableProps<T, IdType>['columns']
+  actions: EntityTableProps<T, IdType>['dataActions']
+  showDataActions: EntityTableProps<T, IdType>['showDataActions']
   renderData: RenderDataType<T, IdType>
 }
 
@@ -15,8 +15,8 @@ const DataTable = <T, IdType = unknown>({
   entries,
   columns,
   getRowId,
-  onEdit,
-  onDelete,
+  actions,
+  showDataActions,
   renderData,
 }: DataTableProps<T, IdType>) => {
   return (
@@ -32,11 +32,13 @@ const DataTable = <T, IdType = unknown>({
                   </span>
                 </th>
               ))}
-              <th className="px-4 py-3 text-left">
-                <span className="font-semibold text-foreground text-sm uppercase tracking-wide">
-                  Actions
-                </span>
-              </th>
+              {showDataActions && (
+                <th className="px-4 py-3 text-left">
+                  <span className="font-semibold text-foreground text-sm uppercase tracking-wide">
+                    Actions
+                  </span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/30">
@@ -53,30 +55,36 @@ const DataTable = <T, IdType = unknown>({
                     {renderData({
                       column: col,
                       entry,
-                      defaultData: String(entry[col.key]),
+                      defaultData: String(entry[col.key as keyof T]),
                     })}
                   </td>
                 ))}
-                <td className="px-4 py-3">
-                  <div className="flex items-center space-x-1">
-                    <Button
-                      onClick={() => onEdit(entry)}
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                    >
-                      <Edit className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      onClick={() => onDelete(entry)}
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </td>
+                {showDataActions && (
+                  <td className="px-4 py-3">
+                    <div className="flex items-center space-x-1">
+                      {actions.onEdit && (
+                        <Button
+                          onClick={() => actions.onEdit!(entry)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {actions.onDelete && (
+                        <Button
+                          onClick={() => actions.onDelete!(entry)}
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

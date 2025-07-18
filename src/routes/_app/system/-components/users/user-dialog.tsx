@@ -1,16 +1,14 @@
 import {
   DialogHeader,
-  DialogFooter,
   Dialog,
   DialogContent,
   DialogTitle,
-  DialogClose,
 } from '@/components/ui/dialog'
 import { useState, useEffect } from 'react'
 import type { User } from '@/types'
 import type { DialogState } from './types'
 import UserForm from './user-form'
-import { useDeleteUserMutation } from '../-mutations'
+import { useDeleteUserMutation } from '@/mutations'
 import { Button } from '@/components/ui/button'
 
 type UserDialogProps = {

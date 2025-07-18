@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react'
 import type { Tablet } from '@/types'
 import type { DialogState } from './types'
 import TabletForm from './tablet-form'
-import { useDeleteTabletMutation } from '../-mutations'
+import { useDeleteTabletMutation } from '@/mutations'
 
 type TabletDialogProps = {
   dialogState: DialogState

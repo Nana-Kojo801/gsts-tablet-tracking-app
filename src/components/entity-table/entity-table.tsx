@@ -3,6 +3,13 @@ import DataTable from './data-table'
 import { Input } from '../ui/input'
 import { useState } from 'react'
 import { Button } from '../ui/button'
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '../ui/select'
 
 export type RenderDataType<T, IdType> = (props: {
   column: EntityTableProps<T, IdType>['columns'][0]
@@ -10,20 +17,47 @@ export type RenderDataType<T, IdType> = (props: {
   defaultData: string
 }) => string | React.ReactNode
 
+export interface EntityTableFilter {
+  label: string
+  value: string
+  options: { value: string; label: string }[]
+  onChange: (value: string) => void
+}
+
 export interface EntityTableProps<T, IdType = unknown> {
   searchPlaceholder: string
   entries: T[]
   getRowId: (entry: T) => IdType
   entriesSize: number
   pageSize: number
-  columns: { key: keyof T; label: string }[]
+  columns: { key: keyof T | string; label: string }[]
   search: (searchQuery: string, entry: T) => boolean
+  showDataActions?: boolean
   dataActions: {
-    onAdd: () => void
-    onEdit: (item: T) => void
-    onDelete: (item: T) => void
+    onAdd?: () => void
+    onEdit?: (item: T) => void
+    onDelete?: (item: T) => void
+    onImport?: () => void
+    onExport?: (entries: T[]) => void
   }
   renderData?: RenderDataType<T, IdType>
+  filters?: EntityTableFilter[]
+}
+
+function getPaginationRange(current: number, total: number, delta = 2) {
+  const range = []
+  for (
+    let i = Math.max(2, current - delta);
+    i <= Math.min(total - 1, current + delta);
+    i++
+  ) {
+    range.push(i)
+  }
+  if (current - delta > 2) range.unshift('...')
+  if (current + delta < total - 1) range.push('...')
+  range.unshift(1)
+  if (total > 1) range.push(total)
+  return Array.from(new Set(range))
 }
 
 const EntityTable = <T, IdType = unknown>({
@@ -33,9 +67,11 @@ const EntityTable = <T, IdType = unknown>({
   pageSize,
   columns,
   dataActions,
+  showDataActions = true,
   searchPlaceholder,
   search,
   renderData = ({ defaultData }) => defaultData,
+  filters = [],
 }: EntityTableProps<T, IdType>) => {
   const [searchQuery, setSearchQuery] = useState('')
   const [page, setPage] = useState(1)
@@ -43,14 +79,20 @@ const EntityTable = <T, IdType = unknown>({
   const paginatedEntries = entries
     .filter((c) => search(searchQuery, c))
     .slice((page - 1) * pageSize, page * pageSize)
-  const hasMore = page * pageSize < entries.length
+  const totalPages = Math.ceil(entries.length / pageSize)
+  const hasMore = page < totalPages
+
+  // Reset to page 1 if entries change
+  // (optional: can add useEffect for this if needed)
 
   return (
     <div className="space-y-4">
-      {/* Search and Actions */}
-      <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-lg">
+      {/* Search, Filters, and Actions */}
+      <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-5 shadow-lg">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex flex-1 gap-3 items-center">
+            {/* Filters */}
+            {/* Search */}
             <div className="relative w-full max-w-xs">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -60,31 +102,59 @@ const EntityTable = <T, IdType = unknown>({
                 className="pl-10"
               />
             </div>
+            {filters.length > 0 && (
+              <div className="flex gap-2">
+                {filters.map((filter) => (
+                  <Select
+                    key={filter.label}
+                    value={filter.value}
+                    onValueChange={filter.onChange}
+                  >
+                    <SelectTrigger className="w-36">
+                      <SelectValue placeholder={filter.label} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filter.options.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ))}
+              </div>
+            )}
           </div>
           <div className="flex gap-2 items-center justify-end">
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Download className="w-4 h-4" />
-              <span>Export</span>
-            </Button>
-            <Button
-              className="flex items-center space-x-2"
-              onClick={() => dataActions.onAdd()}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Add</span>
-            </Button>
-            <Button variant="outline" className="flex items-center space-x-2">
-              <Upload className="w-4 h-4" />
-              <span>Import</span>
-            </Button>
+            {dataActions.onImport && (
+              <Button onClick={dataActions.onImport} variant="outline" className="flex items-center space-x-2">
+                <Upload className="w-4 h-4" />
+                <span>Import</span>
+              </Button>
+            )}
+            {dataActions.onExport && (
+              <Button variant="outline" className="flex items-center space-x-2">
+                <Download className="w-4 h-4" />
+                <span>Export</span>
+              </Button>
+            )}
+            {dataActions.onAdd && (
+              <Button
+                className="flex items-center space-x-2"
+                onClick={() => dataActions.onAdd!()}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Classes Table */}
+      {/* Data Table */}
       <DataTable<T>
-        onEdit={(dataObj) => dataActions.onEdit(dataObj)}
-        onDelete={(dataObj) => dataActions.onDelete(dataObj)}
+        actions={dataActions}
+        showDataActions={showDataActions}
         entries={paginatedEntries}
         columns={columns}
         getRowId={getRowId}
@@ -94,13 +164,17 @@ const EntityTable = <T, IdType = unknown>({
       {/* Pagination */}
       <div className="flex items-center justify-between bg-card/50 backdrop-blur-xl border border-border/50 rounded-xl p-4">
         <div className="text-sm text-muted-foreground">
-          Showing <span className="font-semibold text-foreground">1</span> to{' '}
+          Showing{' '}
           <span className="font-semibold text-foreground">
-            {entries.length}
+            {(page - 1) * pageSize + 1}
+          </span>{' '}
+          to{' '}
+          <span className="font-semibold text-foreground">
+            {Math.min(page * pageSize, entries.length)}
           </span>{' '}
           of{' '}
           <span className="font-semibold text-foreground">{entriesSize}</span>{' '}
-          classes
+          entries
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -112,9 +186,26 @@ const EntityTable = <T, IdType = unknown>({
           >
             Previous
           </Button>
-          <Button size="sm" className="bg-primary text-primary-foreground">
-            {page}
-          </Button>
+          {/* Page numbers with ellipsis */}
+          {getPaginationRange(page, totalPages).map((p, idx) =>
+            p === '...' ? (
+              <span key={idx} className="px-2 text-muted-foreground">
+                ...
+              </span>
+            ) : (
+              <Button
+                key={p}
+                size="sm"
+                variant={p === page ? 'default' : 'outline'}
+                className={
+                  p === page ? 'bg-primary text-primary-foreground' : ''
+                }
+                onClick={() => setPage(Number(p))}
+              >
+                {p}
+              </Button>
+            ),
+          )}
           <Button
             variant="outline"
             size="sm"

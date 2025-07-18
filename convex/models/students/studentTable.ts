@@ -7,6 +7,5 @@ export const studentTable = defineTable({
     programmeId: v.id("programmes"),
     classId: v.id("classes"),
     tabletId: v.optional(v.id("tablets")),
-    bagNumber: v.optional(v.string()),
     status: userStatus
 }).index("by_name", ["name"])

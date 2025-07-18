@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react'
 import type { Programme } from '@/types'
 import type { DialogState } from './types'
 import ProgrammeForm from './programme-form'
-import { useDeleteProgrammeMutation } from '../-mutations'
+import { useDeleteProgrammeMutation } from '@/mutations'
 import { Button } from '@/components/ui/button'
 
 type ProgrammeDialogProps = {

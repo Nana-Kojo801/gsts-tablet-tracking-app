@@ -4,5 +4,7 @@ import { tabletStatus } from "../../shared/validators";
 
 export const tabletTable = defineTable({
     imei: v.string(),
+    bagNumber: v.string(),
     status: tabletStatus,
+    distributed: v.boolean()
 }).index("by_imei", ["imei"])

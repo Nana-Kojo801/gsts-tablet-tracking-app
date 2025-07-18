@@ -6,7 +6,7 @@ import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 
 const ClassesTab = () => {
-  const { classes } = useAppData()
+  const { classes, students } = useAppData()
 
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
@@ -33,7 +33,17 @@ const ClassesTab = () => {
         entriesSize={classes.length}
         pageSize={100}
         getRowId={(item) => item._id}
-        columns={[{ key: 'name', label: 'Class' }]}
+        columns={[
+          { key: 'name', label: 'Class' },
+          { key: 'students', label: 'Students' },
+        ]}
+        renderData={({ column, entry, defaultData }) => {
+          if (column.key === "students") {
+            const numberOfStudents = students.filter(s => s.classId === entry._id).length
+            return String(numberOfStudents)
+          }
+          return defaultData
+        }}
         search={(searchQuery, entry) =>
           entry.name.toLowerCase().includes(searchQuery.toLowerCase())
         }

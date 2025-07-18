@@ -20,7 +20,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Search, Tablet } from 'lucide-react'
-import { useCreateStudentMutation, useEditStudentMutation } from '../-mutations'
+import { useCreateStudentMutation, useEditStudentMutation } from '@/mutations'
 import type { Class, Programme, Student } from '@/types'
 import type { Id } from '@convex/_generated/dataModel'
 import { useAppData } from '@/hooks/use-app-data'
@@ -67,7 +67,6 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
       .refine((val) => !val || tablets.some((t: any) => t._id === val), {
         message: 'Please select a valid tablet from the list',
       }) as z.ZodType<Id<'tablets'> | undefined>,
-    bagNumber: z.string(),
   })
 
   const form = useForm<z.infer<typeof studentSchema>>({
@@ -79,7 +78,6 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
             programmeId: studentObj.programmeId || '',
             status: studentObj.status,
             tabletId: studentObj.tabletId || undefined,
-            bagNumber: studentObj.bagNumber || '',
           }
         : {
             name: '',
@@ -87,7 +85,6 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
             programmeId: '',
             status: 'Day',
             tabletId: undefined,
-            bagNumber: '',
           },
     resolver: zodResolver(studentSchema),
   })
@@ -282,25 +279,6 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                     </div>
                   )}
                 </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        {/* Bag Number */}
-        <FormField
-          control={form.control}
-          name="bagNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bag Number</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  id="bag-number"
-                  placeholder="Enter bag number"
-                  className="h-10"
-                />
               </FormControl>
               <FormMessage />
             </FormItem>

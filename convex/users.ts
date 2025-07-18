@@ -39,6 +39,7 @@ export const update = mutation({
     id: v.id('users'),
     name: v.optional(v.string()),
     role: v.optional(userRoles),
+    password: v.optional(v.string())
   },
   handler: async (ctx, { id, ...fields }) => {
     await ctx.db.patch(id, fields)

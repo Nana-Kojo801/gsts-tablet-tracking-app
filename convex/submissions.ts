@@ -1,6 +1,7 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import { getAllSubmissionProps } from './models/submissions/helpers'
+import { submissionCondition } from './shared/validators'
 
 export const getAll = query({
   handler: async (ctx) => {
@@ -10,12 +11,25 @@ export const getAll = query({
 
 export const create = mutation({
   args: {
-    studentId: v.id("students"),
-    receivedById: v.id("users"),
-    submissionTime: v.float64()
+    entries: v.array(
+      v.object({
+        studentId: v.id('students'),
+        receivedById: v.id('users'),
+        condition: submissionCondition,
+        submissionTime: v.float64(),
+      }),
+    ),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.insert('submissions', args)
+  handler: async (ctx, { entries }) => {
+    await Promise.all(
+      entries.map(async (args) => {
+        const student = (await ctx.db.get(args.studentId))!
+        if (args.condition === 'Missing')
+          await ctx.db.patch(student.tabletId!, { status: 'lost' })
+        else await ctx.db.patch(student.tabletId!, { distributed: false })
+        await ctx.db.insert("submissions", args)
+      }),
+    )
   },
 })
 

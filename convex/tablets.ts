@@ -13,8 +13,9 @@ export const create = mutation({
   args: {
     imei: v.string(),
     status: tabletStatus,
+    bagNumber: v.string()
   },
-  handler: async (ctx, { imei, status }) => {
+  handler: async (ctx, { imei, status, bagNumber }) => {
     const existingTablet = await ctx.db
       .query('tablets')
       .withIndex('by_imei', (q) => q.eq('imei', imei))
@@ -22,7 +23,7 @@ export const create = mutation({
 
     if (existingTablet) throw Error('Tablet IMEI is taken')
 
-    const newTablet = await ctx.db.insert('tablets', { imei, status })
+    const newTablet = await ctx.db.insert('tablets', { imei, status, distributed: false, bagNumber })
     return newTablet
   },
 })

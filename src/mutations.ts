@@ -39,6 +39,12 @@ export const useDeleteStudentMutation = () => {
     })
 }
 
+export const useImportStudentsMutation = () => {
+    return useMutation({
+        mutationFn: useConvexMutation(api.students.importAll)
+    })
+}
+
 // Tablets
 export const useCreateTabletMutation = () => {
     return useMutation({
@@ -106,5 +112,24 @@ export const useCreateSubmissionMutation = () => {
 export const useDeleteSubmissionMutation = () => {
     return useMutation({
         mutationFn: useConvexMutation(api.submissions.remove)
+    })
+}
+
+// Distributions
+export const useCreateDistributionMutation = () => {
+    return useMutation({
+        mutationFn: useConvexMutation(api.distributions.create)
+    })
+}
+
+export const useDeleteDistributionMutation = () => {
+    return useMutation({
+        mutationFn: useConvexMutation(api.distributions.remove)
+    })
+}
+
+export const useClearAllDataMutation = () => {
+    return useMutation({
+        mutationFn: useConvexMutation(api.data.clearAll)
     })
 }

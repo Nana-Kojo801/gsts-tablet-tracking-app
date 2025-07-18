@@ -1,7 +1,8 @@
 import {
   LayoutDashboard,
   Users,
-  Tablet,
+  Inbox,
+  Gift,
   BarChart3,
   Settings,
   User,
@@ -11,14 +12,16 @@ import {
 import { Button } from './ui/button'
 import { Link } from '@tanstack/react-router'
 import { useUser } from '@/hooks/user-user'
+import Logo from '@/logo.png'
 
 const navigationItems = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
   { name: 'Students', icon: Users, href: '/students' },
-  { name: 'Submissions', icon: Tablet, href: '/submissions' },
+  { name: 'Submissions', icon: Inbox, href: '/submissions' },
+  { name: 'Distributions', icon: Gift, href: '/distributions' },
   { name: 'Reports', icon: BarChart3, href: '/reports' },
-  { name: 'Settings', icon: Settings, href: '/settings' },
   { name: 'System', icon: Monitor, href: '/system' },
+  { name: 'Settings', icon: Settings, href: '/settings' },
 ]
 
 const AppSidebar = () => {
@@ -31,22 +34,24 @@ const AppSidebar = () => {
       {/* Logo */}
       <div className="p-6">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
-            <span className="text-xl font-bold text-primary-foreground">G</span>
-          </div>
+          <img
+            src={Logo}
+            className="w-10 h-10 object-cover rounded-xl shadow-lg"
+          />
           <div className="flex-1">
-              <div className="text-lg font-bold text-foreground">GSTS</div>
-              <div className="text-xs text-muted-foreground font-medium">
-                Tablet Tracker Pro
-              </div>
+            <div className="text-lg font-bold text-foreground">GSTS</div>
+            <div className="text-xs text-muted-foreground font-medium">
+              Tablet Tracker Pro
             </div>
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {navigationItems.map((item) => {
-          const IconComponent = item.icon;
+          const IconComponent = item.icon
+          if (item.name === 'System' && user.role === 'user') return
           return (
             <Link
               to={item.href}
@@ -75,7 +80,7 @@ const AppSidebar = () => {
                 </div>
               )}
             </Link>
-          );
+          )
         })}
       </nav>
 

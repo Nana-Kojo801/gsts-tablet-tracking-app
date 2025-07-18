@@ -11,12 +11,13 @@ import { Input } from '@/components/ui/input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import z from 'zod'
-import { useCreateTabletMutation, useEditTabletMutation } from '../-mutations'
+import { useCreateTabletMutation, useEditTabletMutation } from '@/mutations'
 import type { Tablet } from '@/types'
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 
 const tabletSchema = z.object({
   imei: z.string().nonempty('Tablet IMEI is required'),
+  bagNumber: z.string().nonempty('Bag number is required'),
   status: z.union([z.literal('active'), z.literal('lost')]),
 })
 
@@ -30,8 +31,8 @@ const TabletForm = ({ closeDialog, tabletObj, type }: TabletFormProps) => {
   const form = useForm<z.infer<typeof tabletSchema>>({
     defaultValues:
       type === 'edit' && tabletObj
-        ? { imei: tabletObj.imei, status: tabletObj.status }
-        : { imei: '', status: 'active' },
+        ? { imei: tabletObj.imei, status: tabletObj.status, bagNumber: tabletObj.bagNumber }
+        : { imei: '', bagNumber: '', status: 'active' },
     resolver: zodResolver(tabletSchema),
   })
 
@@ -58,6 +59,19 @@ const TabletForm = ({ closeDialog, tabletObj, type }: TabletFormProps) => {
               <FormLabel>Tablet IMEI</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Enter tablet IMEI" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="bagNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Bag number</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Enter bag number" />
               </FormControl>
               <FormMessage />
             </FormItem>

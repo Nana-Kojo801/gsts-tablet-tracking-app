@@ -35,24 +35,28 @@ const UsersTab = () => {
         entriesSize={users.length}
         pageSize={100}
         getRowId={(item) => item._id}
-        columns={[{ key: 'name', label: 'User' }, { key: 'role', label: 'Role' }]}
+        columns={[
+          { key: 'name', label: 'User' },
+          { key: 'role', label: 'Role' },
+          { key: 'password', label: 'Password' }
+        ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'role') {
             const isAdmin = entry.role === 'admin'
             return (
               <Badge
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border ${isAdmin
-                  ? 'bg-red-500/10 border-red-500 text-red-600'
-                  : 'bg-blue-500/10 border-blue-500 text-blue-600'} backdrop-blur-sm`}
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border ${
+                  isAdmin
+                    ? 'bg-red-500/10 border-red-500 text-red-600'
+                    : 'bg-blue-500/10 border-blue-500 text-blue-600'
+                } backdrop-blur-sm`}
               >
                 {isAdmin ? (
                   <Shield className="w-4 h-4 mr-1 text-red-500/80" />
                 ) : (
                   <UserIcon className="w-4 h-4 mr-1 text-blue-500/80" />
                 )}
-                <span className="capitalize tracking-wide">
-                  {entry.role}
-                </span>
+                <span className="capitalize tracking-wide">{entry.role}</span>
               </Badge>
             )
           }
@@ -72,4 +76,4 @@ const UsersTab = () => {
   )
 }
 
-export default UsersTab 
+export default UsersTab
