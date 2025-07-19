@@ -9,6 +9,7 @@ import type { User } from '@/types'
 import { convexQuery } from '@convex-dev/react-query'
 import { useTheme } from '@/components/theme-provider'
 import AppLoadingScreen from '@/components/app-loading-screen'
+import NotFound from '@/components/not-found'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -17,6 +18,7 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   pendingComponent: AppLoadingScreen,
+  notFoundComponent: NotFound,
   beforeLoad: async ({ context: { queryClient } }) => {
     const userId = localStorage.getItem('session-userId')
     if (!userId) return { userId: null }
