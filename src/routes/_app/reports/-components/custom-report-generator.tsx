@@ -24,7 +24,7 @@ const reportTypes = [
 
 const statusOptions = [
   { value: 'all', label: 'All Statuses' },
-  { value: 'Day', label: 'Day' },
+  { value: 'Day', label: 'Day Student' },
   { value: 'Boarder', label: 'Boarder' },
 ]
 
@@ -68,11 +68,13 @@ export default function CustomReportGenerator({
               <SelectValue placeholder="Report Type" />
             </SelectTrigger>
             <SelectContent>
-              {reportTypes.map((r) => (
-                <SelectItem key={r.value} value={r.value}>
-                  {r.label}
-                </SelectItem>
-              ))}
+              {reportTypes
+                .filter((r) => r.value && r.value.trim() !== '')
+                .map((r) => (
+                  <SelectItem key={r.value} value={r.value}>
+                    {r.label}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -117,11 +119,13 @@ export default function CustomReportGenerator({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Classes</SelectItem>
-              {classes.map((c) => (
-                <SelectItem key={c._id} value={c.name}>
-                  {c.name}
-                </SelectItem>
-              ))}
+              {classes
+                .filter((c) => c.name && c.name.trim() !== '')
+                .map((c) => (
+                  <SelectItem key={c._id} value={c.name}>
+                    {c.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -135,11 +139,13 @@ export default function CustomReportGenerator({
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              {statusOptions.map((s) => (
-                <SelectItem key={s.value} value={s.value}>
-                  {s.label}
-                </SelectItem>
-              ))}
+              {statusOptions
+                .filter((s) => s.value && s.value.trim() !== '')
+                .map((s) => (
+                  <SelectItem key={s.value} value={s.value}>
+                    {s.label}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
