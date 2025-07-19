@@ -22,10 +22,6 @@ export const create = mutation({
   handler: async (ctx, { entries }) => {
     await Promise.all(
       entries.map(async (args) => {
-        const student = (await ctx.db.get(args.studentId))!
-        if (args.condition === 'Missing')
-          await ctx.db.patch(student.tabletId!, { status: 'lost' })
-        else await ctx.db.patch(student.tabletId!, { distributed: false })
         await ctx.db.insert("submissions", args)
       }),
     )

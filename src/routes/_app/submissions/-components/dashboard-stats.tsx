@@ -1,20 +1,30 @@
 import { useAppData } from "@/hooks/use-app-data"
 import { ClipboardList, CheckCircle, Clock, AlertCircle } from "lucide-react"
 
-const DashboardStats = () => {
-  const { submissions, tablets } = useAppData()
+function isToday(date: number) {
+  const d = new Date(date)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+}
 
-  // Calculate real stats
+const DashboardStats = () => {
+  const { submissions, tablets, students } = useAppData()
+
+  // Today's submissions
+  const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
   const totalSubmissions = submissions.length
-  const today = new Date()
-  const collectedToday = submissions.filter((s) => {
-    const date = new Date(s.submissionTime)
-    return date.toDateString() === today.toDateString()
-  }).length
-  const pendingCollections = tablets.filter(
-    (t) => t.distributed && t.status !== "lost"
+  const collectedToday = todaysSubmissions.length
+
+  // Missing devices for today: submissions with condition === 'Missing'
+  const missingDevices = tablets.filter((s) => s.status === 'lost').length
+
+  // Pending submissions for today: students who have not submitted today
+  const studentsWhoSubmittedToday = new Set(todaysSubmissions.map((s) => s.studentId))
+  const pendingCollections = students.filter(
+    (s) => !studentsWhoSubmittedToday.has(s._id)
   ).length
-  const missingDevices = tablets.filter((t) => t.status === "lost").length
 
   const summaryStats = [
     {
@@ -36,7 +46,7 @@ const DashboardStats = () => {
       value: pendingCollections,
       icon: <Clock className="w-6 h-6 text-yellow-600" />,
       iconBg: "bg-yellow-500/10",
-      desc: "Awaiting return",
+      desc: "Awaiting return (today)",
     },
     {
       label: "Missing Devices",

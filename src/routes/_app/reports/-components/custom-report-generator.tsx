@@ -1,0 +1,158 @@
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select'
+import { Calendar } from '@/components/ui/calendar'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { useAppData } from '@/hooks/use-app-data'
+import { FileDown, Printer } from 'lucide-react'
+import dayjs from 'dayjs'
+
+const reportTypes = [
+  { value: 'daily', label: 'Daily Submission' },
+  { value: 'weekly', label: 'Weekly Submission' },
+]
+
+const statusOptions = [
+  { value: 'all', label: 'All Statuses' },
+  { value: 'Day', label: 'Day' },
+  { value: 'Boarder', label: 'Boarder' },
+]
+
+interface CustomReportGeneratorProps {
+  reportType: string
+  setReportType: (v: string) => void
+  date: Date
+  setDate: (d: Date) => void
+  selectedClass: string
+  setSelectedClass: (v: string) => void
+  selectedStatus: string
+  setSelectedStatus: (v: string) => void
+}
+
+export default function CustomReportGenerator({
+  reportType,
+  setReportType,
+  date,
+  setDate,
+  selectedClass,
+  setSelectedClass,
+  selectedStatus,
+  setSelectedStatus,
+}: CustomReportGeneratorProps) {
+  const { classes } = useAppData()
+  const [calendarOpen, setCalendarOpen] = useState(false)
+
+  return (
+    <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 shadow-xl mt-6">
+      <h2 className="text-lg font-semibold text-foreground mb-4">
+        Custom Report Generator
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        {/* Report Type */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-muted-foreground mb-1">
+            Report Type
+          </label>
+          <Select value={reportType} onValueChange={setReportType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Report Type" />
+            </SelectTrigger>
+            <SelectContent>
+              {reportTypes.map((r) => (
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Date */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-muted-foreground mb-1">
+            Date
+          </label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={
+                  'w-full justify-start text-left font-normal' +
+                  (!date ? ' text-muted-foreground' : '')
+                }
+              >
+                {date ? dayjs(date).format('YYYY-MM-DD') : 'Pick a date'}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="p-0">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={(d) => {
+                  if (d) setDate(d)
+                  setCalendarOpen(false)
+                }}
+                autoFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+        {/* Class Filter */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-muted-foreground mb-1">
+            Class Filter
+          </label>
+          <Select value={selectedClass} onValueChange={setSelectedClass}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Classes</SelectItem>
+              {classes.map((c) => (
+                <SelectItem key={c._id} value={c.name}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Status Filter */}
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-muted-foreground mb-1">
+            Status Filter
+          </label>
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              {statusOptions.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      {/* Actions below, right-aligned */}
+      <div className="flex justify-end mt-6 gap-2 flex-wrap">
+        <Button className="flex items-center gap-2">
+          <FileDown className="w-4 h-4" /> Export
+        </Button>
+        <Button variant="secondary" className="flex items-center gap-2">
+          <Printer className="w-4 h-4" /> Print
+        </Button>
+      </div>
+    </div>
+  )
+}

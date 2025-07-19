@@ -5,7 +5,7 @@ import TabletDialog from './tablet-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 import { Badge } from '@/components/ui/badge'
-import { Check, AlertTriangle, Minus } from 'lucide-react'
+import { Check, AlertTriangle } from 'lucide-react'
 
 const TabletsTab = () => {
   const { tablets } = useAppData()
@@ -18,16 +18,14 @@ const TabletsTab = () => {
 
   // Filter state
   const [selectedStatus, setSelectedStatus] = useState('all')
-  const [selectedDistributed, setSelectedDistributed] = useState('all')
 
   // Filtered tablets
   const filteredTablets = useMemo(() => {
     return tablets.filter(t => {
       const statusMatch = selectedStatus === 'all' || t.status === selectedStatus
-      const distributedMatch = selectedDistributed === 'all' || (selectedDistributed === 'distributed' ? t.distributed : !t.distributed)
-      return statusMatch && distributedMatch
+      return statusMatch
     })
-  }, [tablets, selectedStatus, selectedDistributed])
+  }, [tablets, selectedStatus])
 
   // Filters for EntityTable
   const filters = [
@@ -40,16 +38,6 @@ const TabletsTab = () => {
         { value: 'lost', label: 'Lost' },
       ],
       onChange: setSelectedStatus,
-    },
-    {
-      label: 'Distributed',
-      value: selectedDistributed,
-      options: [
-        { value: 'all', label: 'All' },
-        { value: 'distributed', label: 'Distributed' },
-        { value: 'not_distributed', label: 'Not Distributed' },
-      ],
-      onChange: (val: string) => setSelectedDistributed(val),
     },
   ]
 
@@ -75,8 +63,7 @@ const TabletsTab = () => {
         columns={[
           { key: 'imei', label: 'IMEI' },
           { key: 'bagNumber', label: 'Bag Number' },
-          { key: 'status', label: 'Status' },
-          { key: 'distributed', label: 'Distributed' }
+          { key: 'status', label: 'Status' }
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'status') {
@@ -92,23 +79,6 @@ const TabletsTab = () => {
                 <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-red-500/10 border-red-500 text-red-700">
                   <AlertTriangle className="w-4 h-4 mr-1 text-red-600" />
                   Lost
-                </Badge>
-              )
-            }
-          }
-          if (column.key === 'distributed') {
-            if (entry.distributed) {
-              return (
-                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
-                  <Check className="w-4 h-4 mr-1 text-green-600" />
-                  Distributed
-                </Badge>
-              )
-            } else {
-              return (
-                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-muted border-border text-muted-foreground">
-                  <Minus className="w-4 h-4 mr-1 text-muted-foreground" />
-                  Not Distributed
                 </Badge>
               )
             }

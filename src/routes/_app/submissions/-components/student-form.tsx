@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { Search, User } from 'lucide-react'
+import { Search, User, CheckCircle2 } from 'lucide-react'
 import { useCreateSubmissionMutation } from '@/mutations'
 import type { Student } from '@/types'
 import { useAppData } from '@/hooks/use-app-data'
@@ -29,8 +29,18 @@ interface StudentFormProps {
   closeDialog: () => void
 }
 
+function isToday(date: number) {
+  const d = new Date(date)
+  const now = new Date()
+  return (
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+  )
+}
+
 const StudentForm = ({ closeDialog }: StudentFormProps) => {
-  const { students } = useAppData()
+  const { students, submissions } = useAppData()
   const user = useUser()
   const [studentSearch, setStudentSearch] = useState<string | undefined>()
   const [showStudentDropdown, setShowStudentDropdown] = useState(false)
@@ -38,18 +48,16 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
   const matchingStudents = studentSearch
     ? students.filter(
         (s) =>
-          s.tablet &&
-          s.tablet.distributed &&
-          (s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
-            s.class?.toLowerCase().includes(studentSearch.toLowerCase())),
+          s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
+          s.class?.toLowerCase().includes(studentSearch.toLowerCase()),
       )
-    : students.filter((s) => s.tablet && s.tablet.distributed)
+    : students
 
   const createSubmission = useCreateSubmissionMutation()
 
   const submissionSchema = z.object({
     studentId: z.string().nonempty('Student is required'),
-    tabletCondition: z.enum(['Good', 'Bad', 'Missing'], {
+    tabletCondition: z.enum(['Good', 'Bad'], {
       required_error: 'Tablet condition is required',
     }),
   })
@@ -61,6 +69,13 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
     },
     resolver: zodResolver(submissionSchema),
   })
+
+  // Check if selected student has already submitted today
+  const hasSubmittedToday = selectedStudent
+    ? submissions.some(
+        (s) => s.studentId === selectedStudent._id && isToday(s.submissionTime),
+      )
+    : false
 
   const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
     if (!selectedStudent) return
@@ -116,7 +131,7 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
                     className="h-10 pl-9"
                   />
                   {showStudentDropdown && (
-                    <div className="absolute z-20 bg-white border border-primary/20 rounded-lg w-full max-h-40 overflow-y-auto shadow-2xl mt-1 animate-fade-in p-1">
+                    <div className="absolute z-20 bg-white dark:bg-muted border border-primary/20 dark:border-border rounded-lg w-full max-h-40 overflow-y-auto shadow-2xl mt-1 animate-fade-in p-1">
                       {matchingStudents.length === 0 ? (
                         <div className="px-3 py-2 text-xs text-muted-foreground text-center select-none">
                           No students found
@@ -125,7 +140,7 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
                         matchingStudents.map((s) => (
                           <div
                             key={s._id}
-                            className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-colors rounded-lg text-xs mb-0.5 ${selectedStudent?._id === s._id ? 'bg-primary/10 font-semibold text-primary' : 'hover:bg-primary/5'}`}
+                            className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-colors rounded-lg text-xs mb-0.5 ${selectedStudent?._id === s._id ? 'bg-primary/10 font-semibold text-primary dark:bg-primary/20 dark:text-primary' : 'hover:bg-primary/5 dark:hover:bg-primary/10'}`}
                             onMouseDown={() => {
                               setSelectedStudent(s)
                               setStudentSearch(s.name)
@@ -149,27 +164,42 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
           )}
         />
         {selectedStudent && (
-          <div className="relative bg-background border border-border rounded-xl shadow-lg p-3 flex flex-col gap-2 mb-4 mt-2 overflow-hidden">
-            <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-l-xl" />
-            <div className="flex-1 grid grid-cols-2 items-center gap-4">
-              <div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  Name
+          <>
+            <div className="relative bg-background dark:bg-muted border border-border rounded-xl shadow-lg p-3 flex flex-col gap-2 mb-4 mt-2 overflow-hidden">
+              <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-l-xl" />
+              <div className="flex-1 grid grid-cols-2 items-center gap-4">
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                    Name
+                  </div>
+                  <div className="text-base font-bold text-foreground truncate">
+                    {selectedStudent.name}
+                  </div>
                 </div>
-                <div className="text-base font-bold text-foreground truncate">
-                  {selectedStudent.name}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  Tablet IMEI
-                </div>
-                <div className="text-base font-medium">
-                  {selectedStudent.tablet?.imei || 'N/A'}
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                    Tablet IMEI
+                  </div>
+                  <div className="text-base font-medium">
+                    {selectedStudent.tablet?.imei || 'N/A'}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+            {/* Info boxes below details */}
+            {!selectedStudent.tablet && (
+              <div className="flex items-center gap-2 mb-4 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                <User className="w-4 h-4" />
+                This student does not have a tablet.
+              </div>
+            )}
+            {selectedStudent.tablet && hasSubmittedToday && (
+              <div className="flex items-center gap-2 mb-4 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
+                <CheckCircle2 className="w-4 h-4" />
+                This student has already submitted today.
+              </div>
+            )}
+          </>
         )}
         <FormField
           control={form.control}
@@ -185,7 +215,6 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
                   <SelectContent>
                     <SelectItem value="Good">Good</SelectItem>
                     <SelectItem value="Bad">Bad</SelectItem>
-                    <SelectItem value="Missing">Missing</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -197,9 +226,19 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
           <Button
             type="submit"
             className="h-10"
-            disabled={createSubmission.isPending}
+            disabled={
+              createSubmission.isPending ||
+              !!hasSubmittedToday ||
+              !!(selectedStudent && !selectedStudent.tablet)
+            }
           >
-            {createSubmission.isPending ? 'Submitting...' : 'Submit Collection'}
+            {!selectedStudent?.tablet
+              ? 'No Tablet'
+              : hasSubmittedToday
+              ? 'Already Submitted'
+              : createSubmission.isPending
+              ? 'Submitting...'
+              : 'Submit Collection'}
           </Button>
           <Button
             onClick={closeDialog}

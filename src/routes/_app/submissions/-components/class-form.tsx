@@ -22,13 +22,22 @@ import { useCreateSubmissionMutation } from '@/mutations'
 import { useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
 import type { Class } from '@/types'
+import { CheckCircle2, Users } from 'lucide-react'
 
 interface ClassFormProps {
   closeDialog: () => void
 }
 
+function isToday(date: number) {
+  const d = new Date(date)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+}
+
 const ClassForm = ({ closeDialog }: ClassFormProps) => {
-  const { classes, students } = useAppData()
+  const { classes, students, submissions } = useAppData()
   const user = useUser()
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
 
@@ -36,7 +45,7 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
 
   const submissionSchema = z.object({
     classId: z.string().nonempty('Class is required'),
-    tabletCondition: z.enum(['Good', 'Bad', 'Missing'], {
+    tabletCondition: z.enum(['Good', 'Bad'], {
       required_error: 'Tablet condition is required',
     }),
   })
@@ -49,19 +58,32 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
     resolver: zodResolver(submissionSchema),
   })
 
+  // Get students in the selected class
+  const studentsInClass = selectedClass
+    ? students.filter((s) => s.classId === selectedClass._id)
+    : []
+
+  // Students in class who have a tablet
+  const studentsWithTablet = studentsInClass.filter((s) => s.tablet)
+  // Students in class who do not have a tablet
+  const studentsWithoutTablet = studentsInClass.filter((s) => !s.tablet)
+
+  // For each student with a tablet, check if they have submitted today
+  const studentsWhoHaveNotSubmitted = studentsWithTablet.filter((student) =>
+    !submissions.some(
+      (s) => s.studentId === student._id && isToday(s.submissionTime)
+    )
+  )
+  const allSubmitted = studentsWithTablet.length > 0 && studentsWhoHaveNotSubmitted.length === 0
+
   const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
     if (!selectedClass) return
-    const payload = students
-      .filter(
-        (s) =>
-          s.tablet && s.tablet.distributed && s.classId === selectedClass._id,
-      )
-      .map((student) => ({
-        studentId: student._id,
-        receivedById: user._id,
-        submissionTime: Date.now(),
-        condition: values.tabletCondition,
-      }))
+    const payload = studentsWhoHaveNotSubmitted.map((student) => ({
+      studentId: student._id,
+      receivedById: user._id,
+      submissionTime: Date.now(),
+      condition: values.tabletCondition,
+    }))
     await createSubmission.mutateAsync({ entries: payload })
     closeDialog()
   }
@@ -87,9 +109,9 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                   <SelectTrigger className="h-10 w-full">
                     <SelectValue placeholder="Select class" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-muted border border-primary/20 dark:border-border text-foreground dark:text-foreground">
                     {classes.map((c) => (
-                      <SelectItem key={c._id} value={c._id}>
+                      <SelectItem key={c._id} value={c._id} className="dark:bg-muted dark:text-foreground">
                         {c.name}
                       </SelectItem>
                     ))}
@@ -101,30 +123,59 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
           )}
         />
         {selectedClass && (
-          <div className="relative bg-background border border-border rounded-xl p-3 flex flex-col sm:flex-row gap-3 items-center mb-4 mt-2 overflow-hidden">
-            <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-l-xl" />
-            <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
-              <div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  Class Name
+          <>
+            <div className="relative bg-background dark:bg-muted border border-border rounded-xl p-3 flex flex-col sm:flex-row gap-3 items-center mb-4 mt-2 overflow-hidden">
+              <div className="absolute left-0 top-0 h-full w-1 bg-primary rounded-l-xl" />
+              <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                    Class Name
+                  </div>
+                  <div className="text-base font-bold text-foreground">
+                    {selectedClass.name}
+                  </div>
                 </div>
-                <div className="text-base font-bold text-foreground">
-                  {selectedClass.name}
-                </div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
-                  Number of Students
-                </div>
-                <div className="text-base font-medium text-primary">
-                  {
-                    students.filter((s) => s.class === selectedClass.name)
-                      .length
-                  }
+                <div>
+                  <div className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                    Number of Students
+                  </div>
+                  <div className="text-base font-medium text-primary">
+                    {studentsInClass.length}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+            {/* Submission info */}
+            <div className="w-full mb-4">
+              {allSubmitted ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
+                    <CheckCircle2 className="w-4 h-4" />
+                    All students with tablets from this class have submitted today.
+                  </div>
+                  {studentsWithoutTablet.length > 0 && (
+                    <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                      <Users className="w-4 h-4" />
+                      {studentsWithoutTablet.length} student{studentsWithoutTablet.length !== 1 ? 's' : ''} from this class do not have a tablet.
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                    <Users className="w-4 h-4" />
+                    {studentsWhoHaveNotSubmitted.length} student{studentsWhoHaveNotSubmitted.length !== 1 ? 's' : ''} from this class have not submitted today (with a tablet).
+                  </div>
+                  {studentsWithoutTablet.length > 0 && (
+                    <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                      <Users className="w-4 h-4" />
+                      {studentsWithoutTablet.length} student{studentsWithoutTablet.length !== 1 ? 's' : ''} from this class do not have a tablet.
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </>
         )}
         <FormField
           control={form.control}
@@ -140,7 +191,6 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                   <SelectContent>
                     <SelectItem value="Good">Good</SelectItem>
                     <SelectItem value="Bad">Bad</SelectItem>
-                    <SelectItem value="Missing">Missing</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -152,9 +202,13 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
           <Button
             type="submit"
             className="h-10"
-            disabled={createSubmission.isPending}
+            disabled={createSubmission.isPending || allSubmitted}
           >
-            {createSubmission.isPending ? 'Submitting...' : 'Submit Collection'}
+            {allSubmitted
+              ? 'All Submitted'
+              : createSubmission.isPending
+              ? 'Submitting...'
+              : 'Submit Collection'}
           </Button>
           <Button
             onClick={closeDialog}

@@ -47,36 +47,36 @@ export function DataManagementSettings() {
       const sheet = workbook.Sheets[sheetName]
       const studentsData = (
         XLSX.utils.sheet_to_json(sheet, { defval: '' }) as any[]
-      ).map((row, idx) => {
-        // Validation: all required fields must exist
-        const requiredFields = [
-          'Student Name',
-          'Programme',
-          'Status',
-          'Class',
-          'Bag Number',
-          'IMEI Number',
-        ];
-        const missing = requiredFields.filter((field) => !(field in row));
-        if (missing.length > 0) {
-          console.error(
-            `Row ${idx + 2} is missing required columns: ${missing.join(', ')}`
-          );
-          return null;
-        }
-        let status = row['Status'] === 'Boarding' ? 'Boarder' : row['Status'];
-        status = status === 'Day' || status === 'Boarder' ? status : 'Day';
-        return {
-          name: row['Student Name'],
-          programme: row['Programme'],
-          status,
-          class: row['Class'],
-          bagNumber: row['Bag Number'],
-          imei: row['IMEI Number'],
-        };
-      })
-      .filter(row => row !== null)
-      .filter((row) => row && row.class && row.class.trim() !== '');
+      )
+        .map((row, idx) => {
+          // Validation: all required fields must exist
+          const requiredFields = [
+            'Student Name',
+            'Programme',
+            'Status',
+            'Class',
+            'Bag Number',
+            'IMEI Number',
+          ]
+          const missing = requiredFields.filter((field) => !(field in row))
+          if (missing.length > 0) {
+            console.error(
+              `Row ${idx + 2} is missing required columns: ${missing.join(', ')}`,
+            )
+            return null
+          }
+          let status = row['Status'] === 'Boarding' ? 'Boarder' : row['Status']
+          status = status === 'Day' || status === 'Boarder' ? status : 'Day'
+          return {
+            name: row['Student Name'],
+            programme: row['Programme'],
+            status,
+            class: row['Class'],
+            bagNumber: row['Bag Number'],
+            imei: row['IMEI Number'],
+          }
+        })
+        .filter((row) => row !== null)
       setIsParsing(false)
       importStudents.mutate({ data: studentsData })
     }
@@ -93,26 +93,50 @@ export function DataManagementSettings() {
       <div className="space-y-4">
         <div className="flex flex-col space-y-8">
           <div className="flex flex-col items-start flex-1">
-            <Button variant="outline" className="flex items-center space-x-2">
+            <Button variant="outline" className="flex items-center space-x-2" disabled>
               <Download className="w-4 h-4" />
-              <span>Export Data</span>
+              <span>Back up Data</span>
             </Button>
             <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
+              <span className="text-orange-500 font-medium">⚠️ Feature not implemented yet</span><br />
               Exports all app data as a <b>JSON</b> file. The exported file will
               contain objects for <code>students</code>, <code>tablets</code>,{' '}
-              <code>submissions</code>, <code>distributions</code>,{' '}
-              <code>classes</code>, and <code>programmes</code>.<br />
+              <code>submissions</code>, <code>classes</code>, and <code>programmes</code>.<br />
               <span className="text-muted-foreground">Example:</span>
               <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs whitespace-pre-wrap break-words max-w-full">
                 {'{'}
                 "students": [...], "tablets": [...], "submissions": [...],
-                "distributions": [...], "classes": [...], "programmes": [...]
+                "classes": [...], "programmes": [...]
                 {'}'}
               </pre>
             </p>
           </div>
           {user.role === 'admin' && (
             <>
+              <div className="flex flex-col items-start flex-1">
+                <Button
+                  variant="outline"
+                  className="flex items-center space-x-2"
+                  disabled
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Restore back up</span>
+                </Button>
+                <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
+                  <span className="text-orange-500 font-medium">⚠️ Feature not implemented yet</span><br />
+                  Imports all app data exported as a <b>JSON</b> file. The exported file
+                  will contain objects for <code>students</code>,{' '}
+                  <code>tablets</code>, <code>submissions</code>,{' '}
+                  <code>classes</code>, and <code>programmes</code>.<br />
+                  <span className="text-muted-foreground">Example:</span>
+                  <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs whitespace-pre-wrap break-words max-w-full">
+                    {'{'}
+                    "students": [...], "tablets": [...], "submissions": [...],
+                    "classes": [...], "programmes": [...]
+                    {'}'}
+                  </pre>
+                </p>
+              </div>
               <div className="flex flex-col items-start flex-1">
                 <Button
                   variant="outline"
@@ -143,8 +167,12 @@ export function DataManagementSettings() {
                   <div className="mt-2 flex items-center gap-2 bg-muted/70 border border-border rounded px-2 py-1 shadow-sm">
                     <Spinner className="w-4 h-4 text-primary animate-spin" />
                     <div>
-                      <div className="font-medium text-sm text-foreground">Importing students...</div>
-                      <div className="text-xs text-muted-foreground">This may take a few moments.</div>
+                      <div className="font-medium text-sm text-foreground">
+                        Importing students...
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        This may take a few moments.
+                      </div>
                     </div>
                   </div>
                 )}

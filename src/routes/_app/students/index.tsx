@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { Student } from '@/types'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
@@ -13,13 +13,85 @@ export const Route = createFileRoute('/_app/students/')({
 })
 
 function StudentsManagement() {
-  const { students } = useAppData()
+  const { students, classes, programmes, tablets } = useAppData()
 
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     action: null,
     studentObj: null,
   })
+
+  const [selectedProgramme, setSelectedProgramme] = useState('all')
+  const [selectedClass, setSelectedClass] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [selectedTablet, setSelectedTablet] = useState('all')
+
+  // Compose tablet options
+  const tabletOptions = useMemo(
+    () => [
+      { value: 'all', label: 'All Tablets' },
+      ...tablets.map((t) => ({ value: t._id, label: t.imei })),
+    ],
+    [tablets],
+  )
+
+  // Filtered students
+  const filteredStudents = useMemo(() => {
+    return students.filter((s) => {
+      const programmeMatch =
+        selectedProgramme === 'all' || s.programmeId === selectedProgramme
+      const classMatch = selectedClass === 'all' || s.classId === selectedClass
+      const statusMatch =
+        selectedStatus === 'all' || s.status === selectedStatus
+      const tabletMatch =
+        selectedTablet === 'all' || s.tabletId === selectedTablet
+      return programmeMatch && classMatch && statusMatch && tabletMatch
+    })
+  }, [
+    students,
+    selectedProgramme,
+    selectedClass,
+    selectedStatus,
+    selectedTablet,
+  ])
+
+  // Filters for EntityTable
+  const filters = [
+    {
+      label: 'Programme',
+      value: selectedProgramme,
+      options: [
+        { value: 'all', label: 'All Programmes' },
+        ...programmes.map((p) => ({ value: p._id, label: p.name })),
+      ],
+      onChange: setSelectedProgramme,
+    },
+    {
+      label: 'Class',
+      value: selectedClass,
+      options: [
+        { value: 'all', label: 'All Classes' },
+        ...classes.map((c) => ({ value: c._id, label: c.name })),
+      ],
+      onChange: setSelectedClass,
+    },
+    {
+      label: 'Status',
+      value: selectedStatus,
+      options: [
+        { value: 'all', label: 'All Statuses' },
+        { value: 'Day', label: 'Day' },
+        { value: 'Boarder', label: 'Boarder' },
+      ],
+      onChange: setSelectedStatus,
+    },
+    {
+      label: 'Tablet',
+      value: selectedTablet,
+      options: tabletOptions,
+      onChange: setSelectedTablet,
+    },
+  ]
 
   // Helper functions
   const openDialog = (
@@ -50,8 +122,9 @@ function StudentsManagement() {
       <div className="overflow-x-auto">
         <EntityTable<Student>
           searchPlaceholder="Search students..."
-          entries={students}
-          entriesSize={students.length}
+          entries={filteredStudents}
+          entriesSize={filteredStudents.length}
+          filters={filters}
           pageSize={100}
           getRowId={(item) => item._id}
           columns={[
@@ -59,7 +132,7 @@ function StudentsManagement() {
             { key: 'programme', label: 'Programme' },
             { key: 'class', label: 'Class' },
             { key: 'tablet', label: 'Tablet' },
-            { key: 'status', label: 'Status' }
+            { key: 'status', label: 'Status' },
           ]}
           renderData={({ column, entry, defaultData }) => {
             if (column.key === 'tablet') {

@@ -11,7 +11,7 @@ export const Route = createFileRoute('/_app/reports/recent-activties/')({
 const PAGE_SIZE = 10
 
 function RecentActivities() {
-  const { submissions, distributions, classes, programmes } = useAppData()
+  const { submissions, classes, programmes } = useAppData()
   const [selectedClass, setSelectedClass] = useState('all')
   const [selectedType, setSelectedType] = useState('all')
   const [selectedProgramme, setSelectedProgramme] = useState('all')
@@ -20,14 +20,6 @@ function RecentActivities() {
   const allActivities = useMemo(
     () =>
       [
-        ...distributions.map((d) => ({
-          type: 'distribution',
-          name: d.student?.name || 'Unknown Student',
-          class: d.student?.class || '',
-          programme: d.student?.programme || '',
-          date: d.distributionTime,
-          _id: d._id,
-        })),
         ...submissions.map((s) => ({
           type: 'submission',
           name: s.student?.name || 'Unknown Student',
@@ -37,7 +29,7 @@ function RecentActivities() {
           _id: s._id,
         })),
       ].sort((a, b) => b.date - a.date),
-    [distributions, submissions],
+    [submissions],
   )
 
   // Filtered activities

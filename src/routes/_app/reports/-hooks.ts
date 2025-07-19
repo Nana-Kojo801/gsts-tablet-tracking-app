@@ -11,7 +11,7 @@ export function useChartData(filterState: {
   startOpen: boolean
   endOpen: boolean
 }) {
-  const { students, distributions, submissions } = useAppData()
+  const { students, submissions } = useAppData()
   // Calculate date range
   let startDate: dayjs.Dayjs
   let endDate = dayjs().endOf('day')
@@ -40,19 +40,7 @@ export function useChartData(filterState: {
     return classMatch && programmeMatch && statusMatch
   })
 
-  // Filter distributions and submissions by student and date
-  const filteredDistributions = distributions.filter((d) => {
-    const student = students.find((s) => s._id === d.studentId)
-    if (!student) return false
-    const studentMatch = filteredStudents.some((s) => s._id === student._id)
-    const dateMatch = dayjs(d.distributionTime).isBetween(
-      startDate,
-      endDate,
-      null,
-      '[]',
-    )
-    return studentMatch && dateMatch
-  })
+  // Filter submissions by student and date
   const filteredSubmissions = submissions.filter((s) => {
     const student = students.find((st) => st._id === s.studentId)
     if (!student) return false
@@ -80,9 +68,6 @@ export function useChartData(filterState: {
     const dateStr = d.format('YYYY-MM-DD')
     return {
       date: d.format(daysCount > 7 ? 'MMM D' : 'ddd, MMM D'),
-      distributions: filteredDistributions.filter(
-        (dist) => dayjs(dist.distributionTime).format('YYYY-MM-DD') === dateStr,
-      ).length,
       submissions: filteredSubmissions.filter(
         (sub) => dayjs(sub.submissionTime).format('YYYY-MM-DD') === dateStr,
       ).length,
@@ -90,15 +75,17 @@ export function useChartData(filterState: {
   })
 
   // Totals for selected range
-  const totalDistributionsInRange = filteredDistributions.length
   const totalSubmissionsInRange = filteredSubmissions.length
+  // Unique students with at least one submission in range
+  const studentsWithSubmissions = new Set(filteredSubmissions.map(s => s.studentId)).size
+  const studentsWithoutSubmissions = filteredStudents.length - studentsWithSubmissions
 
   return {
     chartData,
-    filteredDistributions,
     filteredSubmissions,
-    totalDistributionsInRange,
     totalSubmissionsInRange,
+    studentsWithSubmissions,
+    studentsWithoutSubmissions,
     filteredStudents,
   }
 }

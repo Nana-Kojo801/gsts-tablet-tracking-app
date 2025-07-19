@@ -23,6 +23,7 @@ const router = createRouter({
   defaultStructuralSharing: true,
   defaultPreloadStaleTime: 0,
   defaultNotFoundComponent: NotFound,
+  notFoundMode: 'root'
 })
 
 // Register the router instance for type safety

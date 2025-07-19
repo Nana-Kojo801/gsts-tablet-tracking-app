@@ -7,7 +7,6 @@ export const clearAll = mutation({
       "students",
       "tablets",
       "submissions",
-      "distributions",
       "classes",
       "programmes",
     ] as const;

@@ -32,7 +32,8 @@ export const update = mutation({
   args: {
     id: v.id('tablets'),
     imei: v.optional(v.string()),
-    status: v.optional(tabletStatus)
+    status: v.optional(tabletStatus),
+    bagNumber: v.optional(v.string())
   },
   handler: async (ctx, { id, ...fields }) => {
     await ctx.db.patch(id, fields)

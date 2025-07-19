@@ -17,7 +17,6 @@ import { Route as AppSubmissionsIndexRouteImport } from './routes/_app/submissio
 import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
-import { Route as AppDistributionsIndexRouteImport } from './routes/_app/distributions/index'
 import { Route as AppReportsRecentActivtiesIndexRouteImport } from './routes/_app/reports/recent-activties/index'
 
 const AppRoute = AppRouteImport.update({
@@ -59,11 +58,6 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppDistributionsIndexRoute = AppDistributionsIndexRouteImport.update({
-  id: '/distributions/',
-  path: '/distributions/',
-  getParentRoute: () => AppRoute,
-} as any)
 const AppReportsRecentActivtiesIndexRoute =
   AppReportsRecentActivtiesIndexRouteImport.update({
     id: '/reports/recent-activties/',
@@ -74,7 +68,6 @@ const AppReportsRecentActivtiesIndexRoute =
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
-  '/distributions': typeof AppDistributionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
@@ -85,7 +78,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
-  '/distributions': typeof AppDistributionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
@@ -98,7 +90,6 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
-  '/_app/distributions/': typeof AppDistributionsIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/students/': typeof AppStudentsIndexRoute
@@ -111,7 +102,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/login'
     | '/'
-    | '/distributions'
     | '/reports'
     | '/settings'
     | '/students'
@@ -122,7 +112,6 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/'
-    | '/distributions'
     | '/reports'
     | '/settings'
     | '/students'
@@ -134,7 +123,6 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth/login'
     | '/_app/'
-    | '/_app/distributions/'
     | '/_app/reports/'
     | '/_app/settings/'
     | '/_app/students/'
@@ -206,13 +194,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/distributions/': {
-      id: '/_app/distributions/'
-      path: '/distributions'
-      fullPath: '/distributions'
-      preLoaderRoute: typeof AppDistributionsIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/reports/recent-activties/': {
       id: '/_app/reports/recent-activties/'
       path: '/reports/recent-activties'
@@ -225,7 +206,6 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
-  AppDistributionsIndexRoute: typeof AppDistributionsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppStudentsIndexRoute: typeof AppStudentsIndexRoute
@@ -236,7 +216,6 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
-  AppDistributionsIndexRoute: AppDistributionsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppStudentsIndexRoute: AppStudentsIndexRoute,

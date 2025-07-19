@@ -10,7 +10,7 @@ export function useUser() {
   if (!user) throw redirect({ to: '/login' })
   const { data: liveUser } = useSuspenseQuery({
     ...convexQuery(api.users.get, { id: user._id }),
-    initialData: user
+    initialData: user,
   })
   return liveUser as unknown as User
 }

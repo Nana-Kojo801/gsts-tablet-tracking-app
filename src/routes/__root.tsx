@@ -7,7 +7,8 @@ import type { ConvexReactClient } from 'convex/react'
 import { api } from '@convex/_generated/api'
 import type { User } from '@/types'
 import { convexQuery } from '@convex-dev/react-query'
-import NotFound from '@/components/not-found'
+import { useTheme } from '@/components/theme-provider'
+import AppLoadingScreen from '@/components/app-loading-screen'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -15,7 +16,7 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  notFoundComponent: NotFound,
+  pendingComponent: AppLoadingScreen,
   beforeLoad: async ({ context: { queryClient } }) => {
     const userId = localStorage.getItem('session-userId')
     if (!userId) return { userId: null }
@@ -24,10 +25,13 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     )
     return { user }
   },
-  component: () => (
-    <div className="w-full min-h-screen relative overflow-y-auto bg-background">
-      <Outlet />
-      <Toaster />
-    </div>
-  ),
+  component: () => {
+    const { theme } = useTheme()
+    return (
+      <div className="w-full min-h-screen relative overflow-y-auto bg-background">
+        <Outlet />
+        <Toaster theme={theme} />
+      </div>
+    )
+  },
 })

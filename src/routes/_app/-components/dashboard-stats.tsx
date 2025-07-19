@@ -1,31 +1,34 @@
 import { useAppData } from '@/hooks/use-app-data'
-import { Users, Smartphone, ArrowUpCircle, UserX } from 'lucide-react'
+import { Users, Smartphone, UserX, CheckCircle2 } from 'lucide-react'
 
 export interface DashboardStatsProps {
   totalStudents: number
   totalTablets: number
-  distributedToday: number
   pendingCollections: number
+}
+
+function isToday(date: number) {
+  const d = new Date(date)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
 }
 
 export function DashboardStats() {
   const {
     students,
     tablets,
-    distributions
+    submissions
   } = useAppData()
 
   // Calculate real stats
   const totalStudents = students.length
   const totalTablets = tablets.length
-  const distributedToday = distributions.filter((d) => {
-    const date = new Date(d.distributionTime)
-    const now = new Date()
-    return date.toDateString() === now.toDateString()
-  }).length
-  const pendingCollections = tablets.filter(
-    (t) => t.distributed && t.status !== 'lost',
-  ).length
+  const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
+  const submittedToday = todaysSubmissions.length
+  const studentsWhoSubmittedToday = new Set(todaysSubmissions.map((s) => s.studentId))
+  const pendingSubmissions = students.filter((s) => !studentsWhoSubmittedToday.has(s._id)).length
 
   const stats = [
     {
@@ -43,18 +46,18 @@ export function DashboardStats() {
       desc: 'Total tablets in inventory',
     },
     {
-      label: 'Distributed Today',
-      value: distributedToday,
-      icon: <ArrowUpCircle className="w-6 h-6 text-green-600" />,
+      label: 'Submitted Today',
+      value: submittedToday,
+      icon: <CheckCircle2 className="w-6 h-6 text-green-600" />,
       iconBg: 'bg-green-500/10',
-      desc: 'Tablets handed out today',
+      desc: 'Submissions for today',
     },
     {
-      label: 'Pending Collections',
-      value: pendingCollections,
+      label: 'Pending Submissions',
+      value: pendingSubmissions,
       icon: <UserX className="w-6 h-6 text-yellow-600" />,
       iconBg: 'bg-yellow-500/10',
-      desc: 'Tablets not yet returned',
+      desc: 'Not submitted today',
     },
   ]
 

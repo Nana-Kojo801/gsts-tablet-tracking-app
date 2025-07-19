@@ -9,9 +9,13 @@ import {
   fetchUsersQueryOptions,
 } from '@/queries'
 import { useIsMobile } from '@/hooks/use-mobile'
+import NotFound from '@/components/not-found'
+import ErrorPage from '@/components/error-page'
 
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
+  notFoundComponent: NotFound,
+  errorComponent: ErrorPage,
   beforeLoad: ({ context }) => {
     if (!context.user) throw redirect({ to: '/login' })
   },
