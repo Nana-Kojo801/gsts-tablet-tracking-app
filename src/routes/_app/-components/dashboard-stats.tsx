@@ -1,4 +1,4 @@
-import { useAppData } from '@/hooks/use-app-data'
+import { useAppData, getPendingSubmissionStudents } from '@/hooks/use-app-data'
 import { Users, Smartphone, UserX, CheckCircle2 } from 'lucide-react'
 
 export interface DashboardStatsProps {
@@ -27,8 +27,7 @@ export function DashboardStats() {
   const totalTablets = tablets.length
   const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
   const submittedToday = todaysSubmissions.length
-  const studentsWhoSubmittedToday = new Set(todaysSubmissions.map((s) => s.studentId))
-  const pendingSubmissions = students.filter((s) => !studentsWhoSubmittedToday.has(s._id)).length
+  const pendingSubmissions = getPendingSubmissionStudents(new Date(), students, submissions).length
 
   const stats = [
     {

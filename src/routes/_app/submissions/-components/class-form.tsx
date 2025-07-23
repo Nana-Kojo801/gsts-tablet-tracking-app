@@ -23,6 +23,7 @@ import { useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
 import type { Class } from '@/types'
 import { CheckCircle2, Users } from 'lucide-react'
+import { isFriday } from '@/hooks/use-app-data'
 
 interface ClassFormProps {
   closeDialog: () => void
@@ -58,6 +59,8 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
     resolver: zodResolver(submissionSchema),
   })
 
+  const todayIsFriday = isFriday(new Date())
+
   // Get students in the selected class
   const studentsInClass = selectedClass
     ? students.filter((s) => s.classId === selectedClass._id)
@@ -74,7 +77,12 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
       (s) => s.studentId === student._id && isToday(s.submissionTime)
     )
   )
-  const allSubmitted = studentsWithTablet.length > 0 && studentsWhoHaveNotSubmitted.length === 0
+  // Exclude boarders from pending if not Friday
+  const studentsWhoCanSubmit = todayIsFriday
+    ? studentsWhoHaveNotSubmitted
+    : studentsWhoHaveNotSubmitted.filter((s) => s.status !== 'Boarder')
+  const allSubmitted = studentsWithTablet.length > 0 && studentsWhoCanSubmit.length === 0
+  const onlyBoarders = studentsWithTablet.length > 0 && studentsWithTablet.every((s) => s.status === 'Boarder')
 
   const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
     if (!selectedClass) return
@@ -164,8 +172,14 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                     <Users className="w-4 h-4" />
-                    {studentsWhoHaveNotSubmitted.length} student{studentsWhoHaveNotSubmitted.length !== 1 ? 's' : ''} from this class have not submitted today (with a tablet).
+                    {studentsWhoCanSubmit.length} student{studentsWhoCanSubmit.length !== 1 ? 's' : ''} from this class have not submitted today (with a tablet).
                   </div>
+                  {!todayIsFriday && studentsWithTablet.some((s) => s.status === 'Boarder') && (
+                    <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                      <Users className="w-4 h-4" />
+                      Boarders can only submit on Friday.
+                    </div>
+                  )}
                   {studentsWithoutTablet.length > 0 && (
                     <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                       <Users className="w-4 h-4" />
@@ -202,10 +216,12 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
           <Button
             type="submit"
             className="h-10"
-            disabled={createSubmission.isPending || allSubmitted}
+            disabled={createSubmission.isPending || allSubmitted || (!todayIsFriday && onlyBoarders)}
           >
             {allSubmitted
               ? 'All Submitted'
+              : (!todayIsFriday && onlyBoarders)
+              ? 'Boarders submit on Friday'
               : createSubmission.isPending
               ? 'Submitting...'
               : 'Submit Collection'}

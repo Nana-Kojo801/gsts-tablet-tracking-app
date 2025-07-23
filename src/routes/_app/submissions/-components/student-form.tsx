@@ -24,6 +24,7 @@ import { useCreateSubmissionMutation } from '@/mutations'
 import type { Student } from '@/types'
 import { useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
+import { isFriday } from '@/hooks/use-app-data'
 
 interface StudentFormProps {
   closeDialog: () => void
@@ -76,6 +77,8 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
         (s) => s.studentId === selectedStudent._id && isToday(s.submissionTime),
       )
     : false
+
+  const todayIsFriday = isFriday(new Date())
 
   const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
     if (!selectedStudent) return
@@ -188,15 +191,21 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
             </div>
             {/* Info boxes below details */}
             {!selectedStudent.tablet && (
-              <div className="flex items-center gap-2 mb-4 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+              <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                 <User className="w-4 h-4" />
                 This student does not have a tablet.
               </div>
             )}
             {selectedStudent.tablet && hasSubmittedToday && (
-              <div className="flex items-center gap-2 mb-4 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
+              <div className="flex items-center gap-2 mb-2 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
                 <CheckCircle2 className="w-4 h-4" />
                 This student has already submitted today.
+              </div>
+            )}
+            {selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday && (
+              <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                <User className="w-4 h-4" />
+                Boarders can only submit on Friday.
               </div>
             )}
           </>
@@ -229,13 +238,16 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
             disabled={
               createSubmission.isPending ||
               !!hasSubmittedToday ||
-              !!(selectedStudent && !selectedStudent.tablet)
+              !!(selectedStudent && !selectedStudent.tablet) ||
+              (!!selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday)
             }
           >
             {!selectedStudent?.tablet
               ? 'No Tablet'
               : hasSubmittedToday
               ? 'Already Submitted'
+              : (!!selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday)
+              ? 'Boarders submit on Friday'
               : createSubmission.isPending
               ? 'Submitting...'
               : 'Submit Collection'}

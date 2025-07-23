@@ -1,4 +1,4 @@
-import { useAppData } from '@/hooks/use-app-data'
+import { useAppData, getPendingSubmissionStudents } from '@/hooks/use-app-data'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import dayjs from 'dayjs'
 
@@ -17,7 +17,6 @@ export default function NonComplianceTrendsChart({ date, selectedClass, selected
     (selectedClass === 'all' || s.class === selectedClass) &&
     (selectedStatus === 'all' || s.status === selectedStatus)
   )
-  const totalStudents = filteredStudents.length
   const dateStr = dayjs(date).format('YYYY-MM-DD')
   const studentsWhoSubmittedToday = new Set(
     submissions.filter((s) =>
@@ -25,8 +24,9 @@ export default function NonComplianceTrendsChart({ date, selectedClass, selected
       filteredStudents.some((stu) => stu._id === s.studentId)
     ).map((s) => s.studentId)
   )
-  const submitted = studentsWhoSubmittedToday.size
-  const pending = totalStudents - submitted
+  // Use school policy for pending
+  const pending = getPendingSubmissionStudents(date, filteredStudents, submissions).length
+  const submitted = filteredStudents.length - pending
   const data = [
     { name: 'Submitted', value: submitted },
     { name: 'Pending', value: pending },

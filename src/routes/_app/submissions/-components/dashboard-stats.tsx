@@ -1,4 +1,4 @@
-import { useAppData } from "@/hooks/use-app-data"
+import { useAppData, getPendingSubmissionStudents } from "@/hooks/use-app-data"
 import { ClipboardList, CheckCircle, Clock, AlertCircle } from "lucide-react"
 
 function isToday(date: number) {
@@ -20,11 +20,8 @@ const DashboardStats = () => {
   // Missing devices for today: submissions with condition === 'Missing'
   const missingDevices = tablets.filter((s) => s.status === 'lost').length
 
-  // Pending submissions for today: students who have not submitted today
-  const studentsWhoSubmittedToday = new Set(todaysSubmissions.map((s) => s.studentId))
-  const pendingCollections = students.filter(
-    (s) => !studentsWhoSubmittedToday.has(s._id)
-  ).length
+  // Pending submissions for today: use school policy
+  const pendingCollections = getPendingSubmissionStudents(new Date(), students, submissions).length
 
   const summaryStats = [
     {
