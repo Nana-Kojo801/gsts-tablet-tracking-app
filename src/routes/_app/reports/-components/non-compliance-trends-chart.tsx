@@ -1,6 +1,5 @@
 import { useAppData, getPendingSubmissionStudents } from '@/hooks/use-app-data'
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import dayjs from 'dayjs'
 
 const COLORS = ['#22c55e', '#facc15'] // green, yellow
 
@@ -17,14 +16,7 @@ export default function NonComplianceTrendsChart({ date, selectedClass, selected
     (selectedClass === 'all' || s.class === selectedClass) &&
     (selectedStatus === 'all' || s.status === selectedStatus)
   )
-  const dateStr = dayjs(date).format('YYYY-MM-DD')
-  const studentsWhoSubmittedToday = new Set(
-    submissions.filter((s) =>
-      dayjs(s.submissionTime).format('YYYY-MM-DD') === dateStr &&
-      filteredStudents.some((stu) => stu._id === s.studentId)
-    ).map((s) => s.studentId)
-  )
-  // Use school policy for pending
+
   const pending = getPendingSubmissionStudents(date, filteredStudents, submissions).length
   const submitted = filteredStudents.length - pending
   const data = [
