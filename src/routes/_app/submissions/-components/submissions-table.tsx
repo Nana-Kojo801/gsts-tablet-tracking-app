@@ -1,7 +1,8 @@
 import type { Submissions } from '@/types'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
-import { Calendar } from 'lucide-react'
+import { Calendar, Shield, UserIcon } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 
 interface SubmissionsTableProps {
   onAdd: () => void
@@ -24,6 +25,7 @@ const SubmissionsTable = ({
         getRowId={(item) => item._id}
         columns={[
           { key: 'student', label: 'Student' },
+          { key: 'class', label: 'Class'},
           { key: 'receivedBy', label: 'Received By' },
           { key: 'condition', label: 'Condition' },
           { key: 'submissionTime', label: 'Submission Time' },
@@ -32,8 +34,25 @@ const SubmissionsTable = ({
           if (column.key === 'student') {
             return <span>{entry.student.name}</span>
           }
+          if(column.key === 'class') {
+            return <span>{entry.student.class}</span>
+          }
           if (column.key === 'receivedBy') {
-            return <span>{entry.receivedBy?.name || 'Unknown'}</span>
+            const isAdmin = entry.receivedBy.role
+            return <Badge
+                className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border ${
+                  isAdmin
+                    ? 'bg-red-500/10 border-red-500 text-red-600'
+                    : 'bg-blue-500/10 border-blue-500 text-blue-600'
+                } backdrop-blur-sm`}
+              >
+                {isAdmin ? (
+                  <Shield className="w-4 h-4 mr-1 text-red-500/80" />
+                ) : (
+                  <UserIcon className="w-4 h-4 mr-1 text-blue-500/80" />
+                )}
+                <span className="capitalize tracking-wide">{entry.receivedBy.name}</span>
+              </Badge>
           }
           if (column.key === 'condition') {
             if (entry.condition === 'Good') {
@@ -57,7 +76,7 @@ const SubmissionsTable = ({
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span>
-                  {new Date(entry.submissionTime).toLocaleDateString()}
+                  {new Date(entry.submissionTime).toLocaleTimeString()}
                 </span>
               </div>
             )

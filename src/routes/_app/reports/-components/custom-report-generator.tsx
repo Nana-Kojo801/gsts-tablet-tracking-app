@@ -13,9 +13,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover'
-import { useAppData } from '@/hooks/use-app-data'
-import { FileDown, Printer } from 'lucide-react'
+import { getPendingSubmissionStudents, useAppData } from '@/hooks/use-app-data'
+import { FileDown } from 'lucide-react'
 import dayjs from 'dayjs'
+import * as XLSX from 'xlsx'
+import { toast } from 'sonner'
 
 const reportTypes = [
   { value: 'daily', label: 'Daily Submission' },
@@ -49,8 +51,42 @@ export default function CustomReportGenerator({
   selectedStatus,
   setSelectedStatus,
 }: CustomReportGeneratorProps) {
-  const { classes } = useAppData()
+  const { classes, submissions, students } = useAppData()
   const [calendarOpen, setCalendarOpen] = useState(false)
+
+  const filteredStudents = students.filter(
+    (s) =>
+      (selectedClass === 'all' || s.class === selectedClass) &&
+      (selectedStatus === 'all' || s.status === selectedStatus),
+  )
+
+  const pendingSubmissions = getPendingSubmissionStudents(
+    date,
+    filteredStudents,
+    submissions,
+  )
+
+  const handleExport = () => {
+    try {
+      const data = filteredStudents.map((student) => {
+        const notSubmitted = !!pendingSubmissions.find(
+          (u) => u._id === student._id,
+        )
+        return {
+          student: student.name,
+          class: student.class,
+          imei: student.tablet?.imei || 'N/A',
+          submitted: (notSubmitted || !student.tablet) ? 'No' : 'Yes',
+        }
+      })
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.json_to_sheet(data)
+      XLSX.utils.book_append_sheet(wb, ws, 'SUBMISSIONS REPORT')
+      XLSX.writeFile(wb, `SUBMISSIONS_REPORT_${date.toDateString()}.xlsx`)
+    } catch {
+      toast.error('Something went wrong')
+    }
+  }
 
   return (
     <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 shadow-xl mt-6">
@@ -152,11 +188,8 @@ export default function CustomReportGenerator({
       </div>
       {/* Actions below, right-aligned */}
       <div className="flex justify-end mt-6 gap-2 flex-wrap">
-        <Button className="flex items-center gap-2">
+        <Button onClick={handleExport} className="flex items-center gap-2">
           <FileDown className="w-4 h-4" /> Export
-        </Button>
-        <Button variant="secondary" className="flex items-center gap-2">
-          <Printer className="w-4 h-4" /> Print
         </Button>
       </div>
     </div>

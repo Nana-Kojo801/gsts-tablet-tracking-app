@@ -32,9 +32,11 @@ interface ClassFormProps {
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
-  return d.getFullYear() === now.getFullYear() &&
+  return (
+    d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
+  )
 }
 
 const ClassForm = ({ closeDialog }: ClassFormProps) => {
@@ -71,22 +73,28 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
   // Students in class who do not have a tablet
   const studentsWithoutTablet = studentsInClass.filter((s) => !s.tablet)
 
+  const noOneWithTablet = studentsWithTablet.length === 0
+
   // For each student with a tablet, check if they have submitted today
-  const studentsWhoHaveNotSubmitted = studentsWithTablet.filter((student) =>
-    !submissions.some(
-      (s) => s.studentId === student._id && isToday(s.submissionTime)
-    )
+  const studentsWhoHaveNotSubmitted = studentsWithTablet.filter(
+    (student) =>
+      !submissions.some(
+        (s) => s.studentId === student._id && isToday(s.submissionTime),
+      ),
   )
   // Exclude boarders from pending if not Friday
   const studentsWhoCanSubmit = todayIsFriday
     ? studentsWhoHaveNotSubmitted
     : studentsWhoHaveNotSubmitted.filter((s) => s.status !== 'Boarder')
-  const allSubmitted = studentsWithTablet.length > 0 && studentsWhoCanSubmit.length === 0
-  const onlyBoarders = studentsWithTablet.length > 0 && studentsWithTablet.every((s) => s.status === 'Boarder')
+  const allSubmitted =
+    studentsWithTablet.length > 0 && studentsWhoCanSubmit.length === 0
+  const onlyBoarders =
+    studentsWithTablet.length > 0 &&
+    studentsWithTablet.every((s) => s.status === 'Boarder')
 
   const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
     if (!selectedClass) return
-    const payload = studentsWhoHaveNotSubmitted.map((student) => ({
+    const payload = studentsWhoCanSubmit.map((student) => ({
       studentId: student._id,
       receivedById: user._id,
       submissionTime: Date.now(),
@@ -119,7 +127,11 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                   </SelectTrigger>
                   <SelectContent className="bg-white dark:bg-muted border border-primary/20 dark:border-border text-foreground dark:text-foreground">
                     {classes.map((c) => (
-                      <SelectItem key={c._id} value={c._id} className="dark:bg-muted dark:text-foreground">
+                      <SelectItem
+                        key={c._id}
+                        value={c._id}
+                        className="dark:bg-muted dark:text-foreground"
+                      >
                         {c.name}
                       </SelectItem>
                     ))}
@@ -159,12 +171,17 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
                     <CheckCircle2 className="w-4 h-4" />
-                    All students with tablets from this class have submitted today.
+                    All students with tablets from this class have submitted
+                    today.
                   </div>
                   {studentsWithoutTablet.length > 0 && (
                     <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                       <Users className="w-4 h-4" />
-                      {studentsWithoutTablet.length} student{studentsWithoutTablet.length !== 1 ? 's' : ''} from this class do not have a tablet.
+                      {noOneWithTablet
+                        ? 'All'
+                        : studentsWithoutTablet.length}{' '}
+                      student{studentsWithoutTablet.length !== 1 ? 's' : ''}{' '}
+                      from this class do not have a tablet.
                     </div>
                   )}
                 </div>
@@ -172,18 +189,19 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                     <Users className="w-4 h-4" />
-                    {studentsWhoCanSubmit.length} student{studentsWhoCanSubmit.length !== 1 ? 's' : ''} from this class have not submitted today (with a tablet).
+                    {studentsWhoCanSubmit.length} student
+                    {studentsWhoCanSubmit.length !== 1 ? 's' : ''} from this
+                    class have not submitted today (with a tablet).
                   </div>
-                  {!todayIsFriday && studentsWithTablet.some((s) => s.status === 'Boarder') && (
-                    <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
-                      <Users className="w-4 h-4" />
-                      Boarders can only submit on Friday.
-                    </div>
-                  )}
                   {studentsWithoutTablet.length > 0 && (
                     <div className="flex items-center gap-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
                       <Users className="w-4 h-4" />
-                      {studentsWithoutTablet.length} student{studentsWithoutTablet.length !== 1 ? 's' : ''} from this class do not have a tablet.
+                      {noOneWithTablet
+                        ? 'All'
+                        : studentsWithoutTablet.length}{' '}
+                      student
+                      {studentsWithoutTablet.length !== 1 ? 's' : ''} from this
+                      class do not have a tablet.
                     </div>
                   )}
                 </div>
@@ -216,15 +234,20 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
           <Button
             type="submit"
             className="h-10"
-            disabled={createSubmission.isPending || allSubmitted || (!todayIsFriday && onlyBoarders)}
+            disabled={
+              createSubmission.isPending ||
+              allSubmitted ||
+              noOneWithTablet ||
+              (!todayIsFriday && onlyBoarders)
+            }
           >
             {allSubmitted
               ? 'All Submitted'
-              : (!todayIsFriday && onlyBoarders)
-              ? 'Boarders submit on Friday'
-              : createSubmission.isPending
-              ? 'Submitting...'
-              : 'Submit Collection'}
+              : !todayIsFriday && onlyBoarders
+                ? 'Boarders submit on Friday'
+                : createSubmission.isPending
+                  ? 'Submitting...'
+                  : 'Submit Collection'}
           </Button>
           <Button
             onClick={closeDialog}

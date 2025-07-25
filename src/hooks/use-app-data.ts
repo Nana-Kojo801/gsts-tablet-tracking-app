@@ -6,13 +6,14 @@ import {
   fetchTabletsQueryOptions,
   fetchSubmissionsQueryOptions,
 } from '@/queries'
+import type { Student, Submissions } from '@/types'
 import { useSuspenseQueries } from '@tanstack/react-query'
 
 export function isFriday(date: Date) {
   return date.getDay() === 5 // 0=Sunday, 5=Friday
 }
 
-export function getPendingSubmissionStudents(date: Date, students: any[], submissions: any[]) {
+export function getPendingSubmissionStudents(date: Date, students: Student[], submissions: Submissions[]) {
   const isFri = isFriday(date)
   const dateStr = date.toISOString().slice(0, 10)
   // Only count boarders on Friday
