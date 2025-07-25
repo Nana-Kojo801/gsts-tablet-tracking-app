@@ -71,7 +71,7 @@ export function DataManagementSettings() {
           status = status === 'Day' || status === 'Boarder' ? status : 'Day'
           return {
             name: row['Student Name'],
-            indexNumber: row['Index No'],
+            indexNumber: String(row['Index No']),
             programme: row['Programme'],
             status,
             class: row['Class'],
@@ -80,7 +80,6 @@ export function DataManagementSettings() {
           }
         })
         .filter((row) => row !== null)
-        console.log('data', studentsData)
       setIsParsing(false)
       importStudents.mutate({ data: studentsData })
     }

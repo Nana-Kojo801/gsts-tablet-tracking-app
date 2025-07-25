@@ -81,7 +81,6 @@ export const importAll = mutation({
 
     for (const row of data) {
       // --- Programme ---
-      console.log('programme section')
       let programme = programmeCache.get(row.programme)
       if (!programme) {
         programme = await ctx.db
@@ -98,7 +97,6 @@ export const importAll = mutation({
       }
 
       // --- Class ---
-      console.log('class section')
       let classDoc = classCache.get(row.class)
       if (!classDoc) {
         classDoc = await ctx.db
@@ -115,7 +113,6 @@ export const importAll = mutation({
       }
 
       // --- Tablet (optional) ---
-      console.log('tablet section')
       let tablet
       if (row.imei) {
         tablet = tabletCache.get(row.imei)
@@ -137,7 +134,6 @@ export const importAll = mutation({
       }
 
       // --- Student ---
-      console.log('students section')
       await ctx.db.insert('students', {
         name: row.name,
         programmeId: programme._id,
