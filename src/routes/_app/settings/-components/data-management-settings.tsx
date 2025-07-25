@@ -80,7 +80,7 @@ export function DataManagementSettings() {
           }
         })
         .filter((row) => row !== null)
-        console.log('data', studentsdata)
+        console.log('data', studentsData)
       setIsParsing(false)
       importStudents.mutate({ data: studentsData })
     }
