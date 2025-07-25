@@ -18,7 +18,7 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 const tabletSchema = z.object({
   imei: z.string().nonempty('Tablet IMEI is required'),
   bagNumber: z.string().nonempty('Bag number is required'),
-  status: z.union([z.literal('active'), z.literal('lost')]),
+  status: z.union([z.literal('active'), z.literal('lost'), z.literal('confiscated')]),
 })
 
 type TabletFormProps = {
@@ -91,6 +91,7 @@ const TabletForm = ({ closeDialog, tabletObj, type }: TabletFormProps) => {
                   <SelectContent>
                     <SelectItem value="active">Active</SelectItem>
                     <SelectItem value="lost">Lost</SelectItem>
+                    <SelectItem value="confiscated">Confiscated</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>

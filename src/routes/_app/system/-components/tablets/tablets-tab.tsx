@@ -5,7 +5,7 @@ import TabletDialog from './tablet-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 import { Badge } from '@/components/ui/badge'
-import { Check, AlertTriangle } from 'lucide-react'
+import { Check, AlertTriangle, Ban } from 'lucide-react'
 
 const TabletsTab = () => {
   const { tablets, students } = useAppData()
@@ -61,6 +61,11 @@ const TabletsTab = () => {
                   Lost
                 </Badge>
               )
+            } else if (entry.status === 'confiscated') {
+              return <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
+                <Ban className="w-4 h-4 mr-1 text-orange-600" />
+                Confiscated
+              </Badge>
             }
           }
           return defaultData
