@@ -42,7 +42,7 @@ const TabletsTab = () => {
           { key: 'status', label: 'Status' },
         ]}
         renderData={({ column, entry, defaultData }) => {
-          if (colum.key === 'student') {
+          if (column.key === 'student') {
             const student = students.find(student => student.tablet?.imei === entry.imei)
             return `${!student ? 'Unknown student' : student.name}`
           }
