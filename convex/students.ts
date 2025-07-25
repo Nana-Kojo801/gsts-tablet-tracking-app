@@ -137,7 +137,7 @@ export const importAll = mutation({
       await ctx.db.insert('students', {
         name: row.name,
         programmeId: programme._id,
-        indexNumber: row.indexNumber,
+        indexNumber: '',
         classId: classDoc._id,
         tabletId: tablet?._id,
         status: row.status as 'Day' | 'Boarder',
