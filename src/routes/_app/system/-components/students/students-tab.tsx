@@ -28,12 +28,13 @@ const StudentsTab = () => {
   return (
     <div>
       <EntityTable<Student>
-        searchPlaceholder="Search by name, class..."
+        searchPlaceholder="Search by name, index number, imei..."
         entries={students}
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
           { key: 'name', label: 'Student' },
+          { key: 'indexNumber', label: 'Index Number' },
           { key: 'programme', label: 'Programme' },
           { key: 'class', label: 'Class' },
           { key: 'tablet', label: 'Tablet' },
@@ -61,7 +62,8 @@ const StudentsTab = () => {
         }}
         searchTerms={[
           { key: 'name' },
-          { key: 'class' },
+          { term: (entry) => !entry.tablet ? '' : entry.tablet.imei },
+          { key: 'indexNumber' },
         ]}
         dataActions={{
           onAdd: () => openDialog('add'),

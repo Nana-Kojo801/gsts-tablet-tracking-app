@@ -11,6 +11,7 @@ export const getAll = query({
 export const create = mutation({
   args: {
     name: v.string(),
+    indexNumber: v.string(),
     programmeId: v.id('programmes'),
     classId: v.id('classes'),
     tabletId: v.optional(v.id('tablets')),
@@ -63,6 +64,7 @@ export const importAll = mutation({
     data: v.array(
       v.object({
         name: v.string(),
+        indexNumber: v.string(),
         programme: v.string(),
         status: v.string(),
         class: v.string(),
@@ -135,6 +137,7 @@ export const importAll = mutation({
       await ctx.db.insert('students', {
         name: row.name,
         programmeId: programme._id,
+        indexNumber: row.indexNumber,
         classId: classDoc._id,
         tabletId: tablet?._id,
         status: row.status as 'Day' | 'Boarder',

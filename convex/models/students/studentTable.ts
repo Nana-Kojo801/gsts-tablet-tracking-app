@@ -4,6 +4,7 @@ import { userStatus } from "../../shared/validators";
 
 export const studentTable = defineTable({
     name: v.string(),
+    indexNumber: v.string(),
     programmeId: v.id("programmes"),
     classId: v.id("classes"),
     tabletId: v.optional(v.id("tablets")),
