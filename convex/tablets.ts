@@ -23,7 +23,7 @@ export const create = mutation({
 
     if (existingTablet) throw Error('Tablet IMEI is taken')
 
-    const newTablet = await ctx.db.insert('tablets', { imei, status, distributed: false, bagNumber })
+    const newTablet = await ctx.db.insert('tablets', { imei, status, bagNumber })
     return newTablet
   },
 })

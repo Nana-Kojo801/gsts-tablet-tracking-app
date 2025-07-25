@@ -13,12 +13,13 @@ import {
 } from '@/components/ui/dialog'
 import { useState, useRef } from 'react'
 import { useUser } from '@/hooks/user-user'
-import * as XLSX from 'xlsx'
 import { useImportStudentsMutation } from '@/mutations'
-import Spinner from '@/components/spinner'
+import { useAppData } from '@/hooks/use-app-data'
+import * as XLSX from 'xlsx'
 
 export function DataManagementSettings() {
   const user = useUser()
+  const { students } = useAppData()
   const clearAllData = useClearAllDataMutation()
   const [dialogOpen, setDialogOpen] = useState(false)
 
@@ -84,7 +85,23 @@ export function DataManagementSettings() {
     // Reset input so same file can be selected again
     e.target.value = ''
   }
-  const showImportDiv = isParsing || importStudents.isPending
+
+  const handleExportData = () => {
+    const data = students.map((s) => ({
+      'Student Name': s.name,
+      Programme: s.programme,
+      Status: s.status,
+      Class: s.class,
+      'Bag Number': s.tablet ? s.tablet.bagNumber : '',
+      'IMEI Number': s.tablet ? s.tablet.imei : '',
+    }))
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.json_to_sheet(data)
+    XLSX.utils.book_append_sheet(wb, ws, `MASTER DATA`)
+    XLSX.writeFile(wb, `BACKUP-${crypto.randomUUID()}}.xlsx`)
+  }
+
+  const importingData = isParsing || importStudents.isPending
   return (
     <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-6 shadow-lg space-y-6">
       <h2 className="text-xl font-semibold text-foreground mb-4">
@@ -93,22 +110,19 @@ export function DataManagementSettings() {
       <div className="space-y-4">
         <div className="flex flex-col space-y-8">
           <div className="flex flex-col items-start flex-1">
-            <Button variant="outline" className="flex items-center space-x-2" disabled>
+            <Button
+              variant="outline"
+              className="flex items-center space-x-2"
+              onClick={handleExportData}
+            >
               <Download className="w-4 h-4" />
               <span>Back up Data</span>
             </Button>
             <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
-              <span className="text-orange-500 font-medium">⚠️ Feature not implemented yet</span><br />
-              Exports all app data as a <b>JSON</b> file. The exported file will
-              contain objects for <code>students</code>, <code>tablets</code>,{' '}
-              <code>submissions</code>, <code>classes</code>, and <code>programmes</code>.<br />
-              <span className="text-muted-foreground">Example:</span>
-              <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs whitespace-pre-wrap break-words max-w-full">
-                {'{'}
-                "students": [...], "tablets": [...], "submissions": [...],
-                "classes": [...], "programmes": [...]
-                {'}'}
-              </pre>
+              Exports all app data as a <b>Excel</b> file. The file will have
+              columns: <b>Student Name</b>, <b>Programme</b>, <b>Status</b> (
+              <code>Day</code> or <code>Boarder</code>), <b>Class</b>,{' '}
+              <b>Bag Number</b>, <b>IMEI Number</b>.
             </p>
           </div>
           {user.role === 'admin' && (
@@ -117,35 +131,11 @@ export function DataManagementSettings() {
                 <Button
                   variant="outline"
                   className="flex items-center space-x-2"
-                  disabled
-                >
-                  <Download className="w-4 h-4" />
-                  <span>Restore back up</span>
-                </Button>
-                <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
-                  <span className="text-orange-500 font-medium">⚠️ Feature not implemented yet</span><br />
-                  Imports all app data exported as a <b>JSON</b> file. The exported file
-                  will contain objects for <code>students</code>,{' '}
-                  <code>tablets</code>, <code>submissions</code>,{' '}
-                  <code>classes</code>, and <code>programmes</code>.<br />
-                  <span className="text-muted-foreground">Example:</span>
-                  <pre className="bg-muted/40 rounded p-2 mt-1 overflow-x-auto text-xs whitespace-pre-wrap break-words max-w-full">
-                    {'{'}
-                    "students": [...], "tablets": [...], "submissions": [...],
-                    "classes": [...], "programmes": [...]
-                    {'}'}
-                  </pre>
-                </p>
-              </div>
-              <div className="flex flex-col items-start flex-1">
-                <Button
-                  variant="outline"
-                  className="flex items-center space-x-2"
                   onClick={onMasterImport}
-                  disabled={showImportDiv}
+                  disabled={importingData}
                 >
                   <Upload className="w-4 h-4" />
-                  <span>Master Import</span>
+                  <span>{importingData ? 'Importing data...' : 'Import Data'}</span>
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
                   Import a master Excel (.xlsx) file of students. This will
@@ -163,19 +153,6 @@ export function DataManagementSettings() {
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                {showImportDiv && (
-                  <div className="mt-2 flex items-center gap-2 bg-muted/70 border border-border rounded px-2 py-1 shadow-sm">
-                    <Spinner className="w-4 h-4 text-primary animate-spin" />
-                    <div>
-                      <div className="font-medium text-sm text-foreground">
-                        Importing students...
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        This may take a few moments.
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
               <div className="flex flex-col items-start flex-1">
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

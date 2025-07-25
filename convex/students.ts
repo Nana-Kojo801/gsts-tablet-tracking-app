@@ -99,13 +99,13 @@ export const importAll = mutation({
       if (!classDoc) {
         classDoc = await ctx.db
           .query('classes')
-          .withIndex('by_name', (q) =>
-            q.eq('name', row.class.trim() === '' ? 'Unassigned' : row.class),
-          )
+          .withIndex('by_name', (q) => q.eq('name', row.class))
           .first()
         if (!classDoc) {
-          const classId = await ctx.db.insert('classes', { name: row.class })
-          classDoc = { _id: classId, name: row.class }
+          const classId = await ctx.db.insert('classes', {
+            name: row.class === '' ? 'Unassigned' : row.class,
+          })
+          classDoc = { _id: classId, name: row.class === '' ? 'Unassigned' : row.class }
         }
         classCache.set(row.class, classDoc)
       }
@@ -123,7 +123,6 @@ export const importAll = mutation({
             const tabletId = await ctx.db.insert('tablets', {
               imei: row.imei,
               bagNumber: row.bagNumber,
-              distributed: false,
               status: 'active',
             })
             tablet = { _id: tabletId, imei: row.imei }
