@@ -25,10 +25,6 @@ import type { Class } from '@/types'
 import { CheckCircle2, Users } from 'lucide-react'
 import { isFriday } from '@/hooks/use-app-data'
 
-interface ClassFormProps {
-  closeDialog: () => void
-}
-
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
@@ -39,7 +35,7 @@ function isToday(date: number) {
   )
 }
 
-const ClassForm = ({ closeDialog }: ClassFormProps) => {
+const ClassForm = () => {
   const { classes, students, submissions } = useAppData()
   const user = useUser()
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
@@ -101,7 +97,6 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
       condition: values.tabletCondition,
     }))
     await createSubmission.mutateAsync({ entries: payload })
-    closeDialog()
   }
 
   return (
