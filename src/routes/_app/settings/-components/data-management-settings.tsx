@@ -16,6 +16,7 @@ import { useUser } from '@/hooks/user-user'
 import { useImportStudentsMutation } from '@/mutations'
 import { useAppData } from '@/hooks/use-app-data'
 import * as XLSX from 'xlsx'
+import { toast } from 'sonner'
 
 export function DataManagementSettings() {
   const user = useUser()
@@ -44,59 +45,44 @@ export function DataManagementSettings() {
         return
       }
       const workbook = XLSX.read(data, { type: 'array' })
-const sheetName = workbook.SheetNames[0]
-const sheet = workbook.Sheets[sheetName]
-const studentsData = (
-  XLSX.utils.sheet_to_json(sheet, { 
-    header: 1, // This tells XLSX to use the first row as headers
-    defval: '' 
-  }) as any[]
-)
-  .slice(1) // Skip the first row (headers)
-  .map((row, idx) => {
-    // Convert array row to object using known column positions
-    // Adjust these indices based on your actual column order
-    const rowObj = {
-      'Index No': row[0],
-      'Student Name': row[1], 
-      'Programme': row[2],
-      'Status': row[3],
-      'Class': row[4],
-      'Bag Number': row[5],
-      'IMEI Number': row[6]
-    }
-
-    // Validation: all required fields must exist
-    const requiredFields = [
-      'Index No',
-      'Student Name', 
-      'Programme',
-      'Status',
-      'Class',
-      'Bag Number',
-      'IMEI Number',
-    ]
-    const missing = requiredFields.filter((field) => !rowObj[field])
-    if (missing.length > 0) {
-      console.error(
-        `Row ${idx + 2} is missing required columns: ${missing.join(', ')}`,
+      const sheetName = workbook.SheetNames[0]
+      const sheet = workbook.Sheets[sheetName]
+      const studentsData = (
+        XLSX.utils.sheet_to_json(sheet, { defval: '' }) as any[]
       )
-      return null
-    }
+        .map((row, idx) => {
+          // Validation: all required fields must exist
+          const requiredFields = [
+            'Index No',
+            'Student Name',
+            'Programme',
+            'Status',
+            'Class',
+            'Bag Number',
+            'IMEI Number',
+          ]
+          const missing = requiredFields.filter((field) => !(field in row))
+          if (missing.length > 0) {
+            toast.error(
+              `Row ${idx + 2} is missing required columns: ${missing.join(', ')}`,
+            )
+            return null
+          }
 
-    let status = rowObj['Status'] === 'Boarding' ? 'Boarder' : rowObj['Status']
-    status = status === 'Day' || status === 'Boarder' ? status : 'Day'
-    
-    return {
-      name: rowObj['Student Name'],
-      indexNumber: String(rowObj['Index No']),
-      programme: rowObj['Programme'],
-      status,
-      class: rowObj['Class'],
-      bagNumber: rowObj['Bag Number'],
-      imei: rowObj['IMEI Number'],
-    }
-  }).filter((row) => row !== null)
+          let status = row['Status'] === 'Boarding' ? 'Boarder' : row['Status']
+          status = status === 'Day' || status === 'Boarder' ? status : 'Day'
+
+          return {
+            name: row['Student Name'],
+            indexNumber: String(row['Index No']),
+            programme: row['Programme'],
+            status,
+            class: row['Class'],
+            bagNumber: row['Bag Number'],
+            imei: row['IMEI Number'],
+          }
+        })
+        .filter((row) => row !== null)
       setIsParsing(false)
       importStudents.mutate({ data: studentsData })
     }
@@ -154,7 +140,9 @@ const studentsData = (
                   disabled={importingData}
                 >
                   <Upload className="w-4 h-4" />
-                  <span>{importingData ? 'Importing data...' : 'Import Data'}</span>
+                  <span>
+                    {importingData ? 'Importing data...' : 'Import Data'}
+                  </span>
                 </Button>
                 <p className="text-xs text-muted-foreground mt-1 ml-1 break-words max-w-full">
                   Import a master Excel (.xlsx) file of students. This will
