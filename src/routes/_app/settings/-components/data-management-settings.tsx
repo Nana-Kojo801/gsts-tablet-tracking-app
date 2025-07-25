@@ -47,7 +47,7 @@ export function DataManagementSettings() {
       const sheetName = workbook.SheetNames[0]
       const sheet = workbook.Sheets[sheetName]
       const studentsData = (
-        XLSX.utils.sheet_to_json(sheet, { defval: '' }) as any[]
+        XLSX.utils.sheet_to_json(sheet, { range: 1, defval: '' }) as any[]
       )
         .map((row, idx) => {
           // Validation: all required fields must exist
