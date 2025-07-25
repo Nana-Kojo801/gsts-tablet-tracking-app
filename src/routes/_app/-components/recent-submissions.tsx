@@ -3,7 +3,7 @@ import { useAppData } from '@/hooks/use-app-data'
 import { Link } from '@tanstack/react-router'
 import { Calendar, Inbox } from 'lucide-react'
 
-const RecentActivity = () => {
+const RecentSubmissions = () => {
   const { submissions } = useAppData()
   const recentActivity = submissions
     .map((s) => ({
@@ -18,9 +18,9 @@ const RecentActivity = () => {
     <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-2xl p-6 shadow-xl">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-foreground">
-          Recent Activity
+          Recent Submission
         </h2>
-        <Link to='/reports/recent-activties'>
+        <Link to='/recent-submissions'>
           <Button variant="outline" size="sm">
             <Calendar className="w-4 h-4 mr-2" />
             View All
@@ -48,4 +48,4 @@ const RecentActivity = () => {
   )
 }
 
-export default RecentActivity
+export default RecentSubmissions

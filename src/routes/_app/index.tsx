@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import RecentActivity from './reports/-components/recent-activity'
 import { DashboardStats } from './-components/dashboard-stats'
 import { QuickLinks } from './-components/quick-links'
+import RecentSubmissions from './-components/recent-submissions'
 
 export const Route = createFileRoute('/_app/')({
   component: Dashboard,
@@ -30,7 +30,7 @@ function Dashboard() {
       <QuickLinks />
 
       {/* Recent Activity Section */}
-      <RecentActivity />
+      <RecentSubmissions />
     </div>
   )
 }

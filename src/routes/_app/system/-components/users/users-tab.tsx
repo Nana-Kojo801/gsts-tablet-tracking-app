@@ -32,7 +32,6 @@ const UsersTab = () => {
       <EntityTable<User>
         searchPlaceholder="Search users..."
         entries={users}
-        entriesSize={users.length}
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
@@ -62,9 +61,7 @@ const UsersTab = () => {
           }
           return defaultData
         }}
-        search={(searchQuery, entry) =>
-          entry.name.toLowerCase().includes(searchQuery.toLowerCase())
-        }
+        searchTerms={[{ key: 'name' }]}
         dataActions={{
           onAdd: () => openDialog('add'),
           onEdit: (item) => openDialog('edit', item),

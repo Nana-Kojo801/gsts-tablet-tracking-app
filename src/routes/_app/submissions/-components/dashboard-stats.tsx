@@ -1,5 +1,5 @@
 import { useAppData, getPendingSubmissionStudents } from "@/hooks/use-app-data"
-import { ClipboardList, CheckCircle, Clock, AlertCircle } from "lucide-react"
+import { CheckCircle, Clock, AlertCircle } from "lucide-react"
 
 function isToday(date: number) {
   const d = new Date(date)
@@ -14,7 +14,6 @@ const DashboardStats = () => {
 
   // Today's submissions
   const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
-  const totalSubmissions = submissions.length
   const collectedToday = todaysSubmissions.length
 
   // Missing devices for today: submissions with condition === 'Missing'
@@ -24,13 +23,6 @@ const DashboardStats = () => {
   const pendingCollections = getPendingSubmissionStudents(new Date(), students, submissions).length
 
   const summaryStats = [
-    {
-      label: "Total Submissions",
-      value: totalSubmissions,
-      icon: <ClipboardList className="w-6 h-6 text-primary" />,
-      iconBg: "bg-primary/10",
-      desc: "All submission records",
-    },
     {
       label: "Submitted Today",
       value: collectedToday,
@@ -54,7 +46,7 @@ const DashboardStats = () => {
     },
   ]
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
       {summaryStats.map((stat, idx) => (
         <div
           key={stat.label}

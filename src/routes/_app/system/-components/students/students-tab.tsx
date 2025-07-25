@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import type { Student } from '@/types'
 import type { DialogState } from './types'
 import StudentDialog from './student-dialog'
@@ -8,75 +8,13 @@ import { Badge } from '@/components/ui/badge'
 import { Tablet as TabletIcon } from 'lucide-react'
 
 const StudentsTab = () => {
-  const { students, programmes, classes, tablets } = useAppData()
+  const { students, programmes, classes } = useAppData()
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     action: null,
     studentObj: null,
   })
 
-  // Filter state
-  const [selectedProgramme, setSelectedProgramme] = useState('all')
-  const [selectedClass, setSelectedClass] = useState('all')
-  const [selectedStatus, setSelectedStatus] = useState('all')
-  const [selectedTablet, setSelectedTablet] = useState('all')
-
-  // Compose tablet options
-  const tabletOptions = useMemo(() => [
-    { value: 'all', label: 'All Tablets' },
-    ...tablets.map(t => ({ value: t._id, label: t.imei }))
-  ], [tablets])
-
-  // Filtered students
-  const filteredStudents = useMemo(() => {
-    return students.filter(s => {
-      const programmeMatch = selectedProgramme === 'all' || s.programmeId === selectedProgramme
-      const classMatch = selectedClass === 'all' || s.classId === selectedClass
-      const statusMatch = selectedStatus === 'all' || s.status === selectedStatus
-      const tabletMatch = selectedTablet === 'all' || s.tabletId === selectedTablet
-      return programmeMatch && classMatch && statusMatch && tabletMatch
-    })
-  }, [students, selectedProgramme, selectedClass, selectedStatus, selectedTablet])
-
-  // Filters for EntityTable
-  const filters = [
-    {
-      label: 'Programme',
-      value: selectedProgramme,
-      options: [
-        { value: 'all', label: 'All Programmes' },
-        ...programmes.map(p => ({ value: p._id, label: p.name }))
-      ],
-      onChange: setSelectedProgramme,
-    },
-    {
-      label: 'Class',
-      value: selectedClass,
-      options: [
-        { value: 'all', label: 'All Classes' },
-        ...classes.map(c => ({ value: c._id, label: c.name }))
-      ],
-      onChange: setSelectedClass,
-    },
-    {
-      label: 'Status',
-      value: selectedStatus,
-      options: [
-        { value: 'all', label: 'All Statuses' },
-        { value: 'Day', label: 'Day' },
-        { value: 'Boarder', label: 'Boarder' },
-      ],
-      onChange: setSelectedStatus,
-    },
-    {
-      label: 'Tablet',
-      value: selectedTablet,
-      options: tabletOptions,
-      onChange: setSelectedTablet,
-    },
-  ]
-
-  // Helper functions
   const openDialog = (
     action: 'add' | 'edit' | 'delete',
     studentObj: Student | null = null,
@@ -90,9 +28,8 @@ const StudentsTab = () => {
   return (
     <div>
       <EntityTable<Student>
-        searchPlaceholder="Search students..."
-        entries={filteredStudents}
-        entriesSize={filteredStudents.length}
+        searchPlaceholder="Search by name, class..."
+        entries={students}
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
@@ -100,7 +37,7 @@ const StudentsTab = () => {
           { key: 'programme', label: 'Programme' },
           { key: 'class', label: 'Class' },
           { key: 'tablet', label: 'Tablet' },
-          { key: 'status', label: 'Status' }
+          { key: 'status', label: 'Status' },
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'tablet') {
@@ -122,20 +59,54 @@ const StudentsTab = () => {
           }
           return defaultData
         }}
-        search={(searchQuery, entry) =>
-          entry.name.toLowerCase().includes(searchQuery.toLowerCase())
-        }
+        searchTerms={[
+          { key: 'name' },
+          { key: 'class' },
+        ]}
         dataActions={{
           onAdd: () => openDialog('add'),
           onEdit: (item) => openDialog('edit', item),
           onDelete: (item) => openDialog('delete', item),
           // onImport will be handled in data management settings
         }}
-        filters={filters}
+        filters={{
+          programmeId: {
+            key: 'programmeId',
+            options: [
+              { label: 'All programmes', value: null },
+              ...programmes.map((p) => ({ value: p._id, label: p.name })),
+            ],
+          },
+          classId: {
+            key: 'classId',
+            options: [
+              { label: 'All Classes', value: null },
+              ...classes.map((c) => ({ value: c._id, label: c.name })),
+            ],
+          },
+          status: {
+            key: 'status',
+            options: [
+              { value: null, label: 'All Statuses' },
+              { value: 'Day', label: 'Day' },
+              { value: 'Boarder', label: 'Boarder' },
+            ],
+          },
+          tablet: {
+            key: 'tablet',
+            customValue: (student, received) =>
+              received === null ? true : received === true ? student.tablet ? true : false : !student.tablet ? true : false,
+            options: [
+              { label: 'All Tablets', value: null },
+              { label: 'Received', value: true },
+              { label: 'Not Received', value: false },
+            ],
+          },
+        }}
       />
       <StudentDialog dialogState={dialogState} closeDialog={closeDialog} />
     </div>
   )
 }
 
-export default StudentsTab 
+export default StudentsTab

@@ -9,23 +9,29 @@ interface SubmissionsTableProps {
   onDelete: (item: Submissions) => void
 }
 
-const SubmissionsTable = ({
-  onAdd,
-  onDelete,
-}: SubmissionsTableProps) => {
+function isToday(date: number) {
+  const d = new Date(date)
+  const now = new Date()
+  return d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate()
+}
+
+const SubmissionsTable = ({ onAdd, onDelete }: SubmissionsTableProps) => {
   const { submissions } = useAppData()
+
+  const filteredSubmissions = submissions.filter(s => isToday(s.submissionTime))
 
   return (
     <div>
       <EntityTable<Submissions>
-        searchPlaceholder="Search submissions..."
-        entries={submissions}
-        entriesSize={submissions.length}
+        searchPlaceholder="Search by student or user..."
+        entries={filteredSubmissions}
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
           { key: 'student', label: 'Student' },
-          { key: 'class', label: 'Class'},
+          { key: 'class', label: 'Class' },
           { key: 'receivedBy', label: 'Received By' },
           { key: 'condition', label: 'Condition' },
           { key: 'submissionTime', label: 'Submission Time' },
@@ -34,12 +40,13 @@ const SubmissionsTable = ({
           if (column.key === 'student') {
             return <span>{entry.student.name}</span>
           }
-          if(column.key === 'class') {
+          if (column.key === 'class') {
             return <span>{entry.student.class}</span>
           }
           if (column.key === 'receivedBy') {
             const isAdmin = entry.receivedBy.role
-            return <Badge
+            return (
+              <Badge
                 className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border ${
                   isAdmin
                     ? 'bg-red-500/10 border-red-500 text-red-600'
@@ -51,8 +58,11 @@ const SubmissionsTable = ({
                 ) : (
                   <UserIcon className="w-4 h-4 mr-1 text-blue-500/80" />
                 )}
-                <span className="capitalize tracking-wide">{entry.receivedBy.name}</span>
+                <span className="capitalize tracking-wide">
+                  {entry.receivedBy.name}
+                </span>
               </Badge>
+            )
           }
           if (column.key === 'condition') {
             if (entry.condition === 'Good') {
@@ -83,14 +93,10 @@ const SubmissionsTable = ({
           }
           return defaultData
         }}
-        search={(searchQuery, entry) =>
-          entry.student.name
-            .toLowerCase()
-            .includes(searchQuery.toLowerCase()) ||
-          entry.receivedBy?.name
-            ?.toLowerCase()
-            .includes(searchQuery.toLowerCase())
-        }
+        searchTerms={[
+          { term: (entry) => entry.student.name },
+          { term: (entry) => entry.receivedBy.name },
+        ]}
         dataActions={{
           onAdd,
           onDelete,

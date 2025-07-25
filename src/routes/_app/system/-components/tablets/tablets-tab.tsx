@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import type { Tablet } from '@/types'
 import type { DialogState } from './types'
 import TabletDialog from './tablet-dialog'
@@ -16,30 +16,6 @@ const TabletsTab = () => {
     tabletObj: null,
   })
 
-  // Filter state
-  const [selectedStatus, setSelectedStatus] = useState('all')
-
-  // Filtered tablets
-  const filteredTablets = useMemo(() => {
-    return tablets.filter(t => {
-      const statusMatch = selectedStatus === 'all' || t.status === selectedStatus
-      return statusMatch
-    })
-  }, [tablets, selectedStatus])
-
-  // Filters for EntityTable
-  const filters = [
-    {
-      label: 'Status',
-      value: selectedStatus,
-      options: [
-        { value: 'all', label: 'All Statuses' },
-        { value: 'active', label: 'Active' },
-        { value: 'lost', label: 'Lost' },
-      ],
-      onChange: setSelectedStatus,
-    },
-  ]
 
   // Helper functions
   const openDialog = (
@@ -55,15 +31,14 @@ const TabletsTab = () => {
   return (
     <div>
       <EntityTable<Tablet>
-        searchPlaceholder="Search tablets..."
-        entries={filteredTablets}
-        entriesSize={filteredTablets.length}
+        searchPlaceholder="Search by imei, bag no..."
+        entries={tablets}
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
           { key: 'imei', label: 'IMEI' },
           { key: 'bagNumber', label: 'Bag Number' },
-          { key: 'status', label: 'Status' }
+          { key: 'status', label: 'Status' },
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'status') {
@@ -85,15 +60,22 @@ const TabletsTab = () => {
           }
           return defaultData
         }}
-        search={(searchQuery, entry) =>
-          entry.imei.toLowerCase().includes(searchQuery.toLowerCase())
-        }
+        searchTerms={[{ key: 'imei' }, { key: 'bagNumber' }]}
         dataActions={{
           onAdd: () => openDialog('add'),
           onEdit: (item) => openDialog('edit', item),
           onDelete: (item) => openDialog('delete', item),
         }}
-        filters={filters}
+        filters={{
+          status: {
+            key: 'status',
+            options: [
+              { label: 'All', value: null },
+              { label: 'Active', value: 'active' },
+              { label: 'Lost', value: 'lost' },
+            ],
+          },
+        }}
       />
       <TabletDialog dialogState={dialogState} closeDialog={closeDialog} />
     </div>

@@ -17,7 +17,7 @@ import { Route as AppSubmissionsIndexRouteImport } from './routes/_app/submissio
 import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
-import { Route as AppReportsRecentActivtiesIndexRouteImport } from './routes/_app/reports/recent-activties/index'
+import { Route as AppRecentSubmissionsIndexRouteImport } from './routes/_app/recent-submissions/index'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -58,77 +58,77 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppReportsRecentActivtiesIndexRoute =
-  AppReportsRecentActivtiesIndexRouteImport.update({
-    id: '/reports/recent-activties/',
-    path: '/reports/recent-activties/',
+const AppRecentSubmissionsIndexRoute =
+  AppRecentSubmissionsIndexRouteImport.update({
+    id: '/recent-submissions/',
+    path: '/recent-submissions/',
     getParentRoute: () => AppRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
   '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
-  '/reports/recent-activties': typeof AppReportsRecentActivtiesIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
   '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
-  '/reports/recent-activties': typeof AppReportsRecentActivtiesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/recent-submissions/': typeof AppRecentSubmissionsIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/students/': typeof AppStudentsIndexRoute
   '/_app/submissions/': typeof AppSubmissionsIndexRoute
   '/_app/system/': typeof AppSystemIndexRoute
-  '/_app/reports/recent-activties/': typeof AppReportsRecentActivtiesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/login'
     | '/'
+    | '/recent-submissions'
     | '/reports'
     | '/settings'
     | '/students'
     | '/submissions'
     | '/system'
-    | '/reports/recent-activties'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
     | '/'
+    | '/recent-submissions'
     | '/reports'
     | '/settings'
     | '/students'
     | '/submissions'
     | '/system'
-    | '/reports/recent-activties'
   id:
     | '__root__'
     | '/_app'
     | '/_auth/login'
     | '/_app/'
+    | '/_app/recent-submissions/'
     | '/_app/reports/'
     | '/_app/settings/'
     | '/_app/students/'
     | '/_app/submissions/'
     | '/_app/system/'
-    | '/_app/reports/recent-activties/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -194,11 +194,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/reports/recent-activties/': {
-      id: '/_app/reports/recent-activties/'
-      path: '/reports/recent-activties'
-      fullPath: '/reports/recent-activties'
-      preLoaderRoute: typeof AppReportsRecentActivtiesIndexRouteImport
+    '/_app/recent-submissions/': {
+      id: '/_app/recent-submissions/'
+      path: '/recent-submissions'
+      fullPath: '/recent-submissions'
+      preLoaderRoute: typeof AppRecentSubmissionsIndexRouteImport
       parentRoute: typeof AppRoute
     }
   }
@@ -206,22 +206,22 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppRecentSubmissionsIndexRoute: typeof AppRecentSubmissionsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppStudentsIndexRoute: typeof AppStudentsIndexRoute
   AppSubmissionsIndexRoute: typeof AppSubmissionsIndexRoute
   AppSystemIndexRoute: typeof AppSystemIndexRoute
-  AppReportsRecentActivtiesIndexRoute: typeof AppReportsRecentActivtiesIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppRecentSubmissionsIndexRoute: AppRecentSubmissionsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppStudentsIndexRoute: AppStudentsIndexRoute,
   AppSubmissionsIndexRoute: AppSubmissionsIndexRoute,
   AppSystemIndexRoute: AppSystemIndexRoute,
-  AppReportsRecentActivtiesIndexRoute: AppReportsRecentActivtiesIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

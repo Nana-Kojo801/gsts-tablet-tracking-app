@@ -1,7 +1,7 @@
 import { Download, Plus, Search, Upload } from 'lucide-react'
 import DataTable from './data-table'
 import { Input } from '../ui/input'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '../ui/button'
 import {
   Select,
@@ -17,21 +17,13 @@ export type RenderDataType<T, IdType> = (props: {
   defaultData: string
 }) => string | React.ReactNode
 
-export interface EntityTableFilter {
-  label: string
-  value: string
-  options: { value: string; label: string }[]
-  onChange: (value: string) => void
-}
-
 export interface EntityTableProps<T, IdType = unknown> {
   searchPlaceholder: string
   entries: T[]
   getRowId: (entry: T) => IdType
-  entriesSize: number
   pageSize: number
   columns: { key: keyof T | string; label: string }[]
-  search: (searchQuery: string, entry: T) => boolean
+  searchTerms: { term?: (entry: T) => string; key?: keyof T }[]
   showDataActions?: boolean
   dataActions: {
     onAdd?: () => void
@@ -41,7 +33,13 @@ export interface EntityTableProps<T, IdType = unknown> {
     onExport?: (entries: T[]) => void
   }
   renderData?: RenderDataType<T, IdType>
-  filters?: EntityTableFilter[]
+  filters?: {
+    [key: string]: {
+      key: keyof T
+      customValue?: (entry: T, value: any) => boolean
+      options: { label: string; value: any }[]
+    }
+  }
 }
 
 function getPaginationRange(current: number, total: number, delta = 2) {
@@ -63,23 +61,60 @@ function getPaginationRange(current: number, total: number, delta = 2) {
 const EntityTable = <T, IdType = unknown>({
   entries,
   getRowId,
-  entriesSize,
   pageSize,
   columns,
   dataActions,
   showDataActions = true,
   searchPlaceholder,
-  search,
+  searchTerms,
   renderData = ({ defaultData }) => defaultData,
-  filters = [],
+  filters = {},
 }: EntityTableProps<T, IdType>) => {
   const [searchQuery, setSearchQuery] = useState('')
-  const [page, setPage] = useState(1)
+  const [filter, setFilter] = useState(
+    filters
+      ? Object.fromEntries(
+          Object.entries(filters).map((entry) => [
+            entry[1].key,
+            entry[1].options[0].value,
+          ]),
+        )
+      : {},
+  )
+  console.log(filter);
+  
+  const filteredEntries = useMemo(() => entries
+    .filter((entry) => {
+      let count = 0
+      for (const key in filter) {
+        if (filters[key].customValue) {
+          if (filters[key].customValue(entry, filter[key])) count++
+        } else {
+          const value = filter[key]
+          if (!value) count++
+          else if ((entry as any)[key] === value) {
+            count++
+          }
+        }
+      }
+      return count === Object.keys(filter).length
+    }).filter((entry) => {
+      let count = 0
+      searchTerms.forEach((term) => {
+        const value = term.term
+          ? term.term(entry)
+          : (entry[term.key!] as string)
+        if (value.toLowerCase().includes(searchQuery.toLowerCase())) count += 1
+      })
+      return count > 0
+    }), [entries, filter, searchQuery])
 
-  const paginatedEntries = entries
-    .filter((c) => search(searchQuery, c))
-    .slice((page - 1) * pageSize, page * pageSize)
-  const totalPages = Math.ceil(entries.length / pageSize)
+  const [page, setPage] = useState(1)
+  const paginatedEntries = filteredEntries.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
+  )
+  const totalPages = Math.ceil(filteredEntries.length / pageSize)
   const hasMore = page < totalPages
 
   // Reset to page 1 if entries change
@@ -102,32 +137,40 @@ const EntityTable = <T, IdType = unknown>({
                 className="pl-10"
               />
             </div>
-            {filters.length > 0 && (
+            {Object.keys.length > 0 && (
               <div className="flex gap-2">
-                {filters.map((filter) => (
-                  <Select
-                    key={filter.label}
-                    value={filter.value}
-                    onValueChange={filter.onChange}
-                  >
-                    <SelectTrigger className="w-36">
-                      <SelectValue placeholder={filter.label} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filter.options.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ))}
+                {Object.entries(filters).map(([key, filters]) => {
+                  return (
+                    <Select
+                      key={key}
+                      value={filter[filters.key as string]}
+                      onValueChange={(value) => {
+                        setFilter((prev) => ({ ...prev, [filters.key]: value }))
+                      }}
+                    >
+                      <SelectTrigger className="w-36">
+                        <SelectValue placeholder={filter.label} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {filters.options.map((opt, index) => (
+                          <SelectItem key={index} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )
+                })}
               </div>
             )}
           </div>
           <div className="flex gap-2 items-center justify-end">
             {dataActions.onImport && (
-              <Button onClick={dataActions.onImport} variant="outline" className="flex items-center space-x-2">
+              <Button
+                onClick={dataActions.onImport}
+                variant="outline"
+                className="flex items-center space-x-2"
+              >
                 <Upload className="w-4 h-4" />
                 <span>Import</span>
               </Button>
@@ -173,7 +216,9 @@ const EntityTable = <T, IdType = unknown>({
             {Math.min(page * pageSize, entries.length)}
           </span>{' '}
           of{' '}
-          <span className="font-semibold text-foreground">{entriesSize}</span>{' '}
+          <span className="font-semibold text-foreground">
+            {filteredEntries.length}
+          </span>{' '}
           entries
         </div>
         <div className="flex items-center space-x-2">
@@ -187,9 +232,9 @@ const EntityTable = <T, IdType = unknown>({
             Previous
           </Button>
           {/* Page numbers with ellipsis */}
-          {getPaginationRange(page, totalPages).map((p, idx) =>
+          {getPaginationRange(page, totalPages).map((p) =>
             p === '...' ? (
-              <span key={idx} className="px-2 text-muted-foreground">
+              <span key={p} className="px-2 text-muted-foreground">
                 ...
               </span>
             ) : (

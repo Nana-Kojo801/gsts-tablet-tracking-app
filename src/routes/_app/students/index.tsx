@@ -1,11 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useMemo, useState } from 'react'
 import type { Student } from '@/types'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
-import StudentDialog from '../system/-components/students/student-dialog'
 import { TabletIcon } from 'lucide-react'
-import type { DialogState } from '../system/-components/students/types'
 import { Badge } from '@/components/ui/badge'
 
 export const Route = createFileRoute('/_app/students/')({
@@ -13,96 +10,7 @@ export const Route = createFileRoute('/_app/students/')({
 })
 
 function StudentsManagement() {
-  const { students, classes, programmes, tablets } = useAppData()
-
-  const [dialogState, setDialogState] = useState<DialogState>({
-    open: false,
-    action: null,
-    studentObj: null,
-  })
-
-  const [selectedProgramme, setSelectedProgramme] = useState('all')
-  const [selectedClass, setSelectedClass] = useState('all')
-  const [selectedStatus, setSelectedStatus] = useState('all')
-  const [selectedTablet, setSelectedTablet] = useState('all')
-
-  // Compose tablet options
-  const tabletOptions = useMemo(
-    () => [
-      { value: 'all', label: 'All Tablets' },
-      ...tablets.map((t) => ({ value: t._id, label: t.imei })),
-    ],
-    [tablets],
-  )
-
-  // Filtered students
-  const filteredStudents = useMemo(() => {
-    return students.filter((s) => {
-      const programmeMatch =
-        selectedProgramme === 'all' || s.programmeId === selectedProgramme
-      const classMatch = selectedClass === 'all' || s.classId === selectedClass
-      const statusMatch =
-        selectedStatus === 'all' || s.status === selectedStatus
-      const tabletMatch =
-        selectedTablet === 'all' || s.tabletId === selectedTablet
-      return programmeMatch && classMatch && statusMatch && tabletMatch
-    })
-  }, [
-    students,
-    selectedProgramme,
-    selectedClass,
-    selectedStatus,
-    selectedTablet,
-  ])
-
-  // Filters for EntityTable
-  const filters = [
-    {
-      label: 'Programme',
-      value: selectedProgramme,
-      options: [
-        { value: 'all', label: 'All Programmes' },
-        ...programmes.map((p) => ({ value: p._id, label: p.name })),
-      ],
-      onChange: setSelectedProgramme,
-    },
-    {
-      label: 'Class',
-      value: selectedClass,
-      options: [
-        { value: 'all', label: 'All Classes' },
-        ...classes.map((c) => ({ value: c._id, label: c.name })),
-      ],
-      onChange: setSelectedClass,
-    },
-    {
-      label: 'Status',
-      value: selectedStatus,
-      options: [
-        { value: 'all', label: 'All Statuses' },
-        { value: 'Day', label: 'Day' },
-        { value: 'Boarder', label: 'Boarder' },
-      ],
-      onChange: setSelectedStatus,
-    },
-    {
-      label: 'Tablet',
-      value: selectedTablet,
-      options: tabletOptions,
-      onChange: setSelectedTablet,
-    },
-  ]
-
-  // Helper functions
-  const openDialog = (
-    action: 'add' | 'edit' | 'delete',
-    studentObj: Student | null = null,
-  ) => {
-    setDialogState({ open: true, action, studentObj })
-  }
-  const closeDialog = () => {
-    setDialogState({ open: false, action: null, studentObj: null })
-  }
+  const { students, classes, programmes } = useAppData()
 
   return (
     <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-6 p-2 sm:p-6">
@@ -122,9 +30,49 @@ function StudentsManagement() {
       <div className="overflow-x-auto">
         <EntityTable<Student>
           searchPlaceholder="Search students..."
-          entries={filteredStudents}
-          entriesSize={filteredStudents.length}
-          filters={filters}
+          entries={students}
+          filters={{
+            programmeId: {
+              key: 'programmeId',
+              options: [
+                { label: 'All programmes', value: null },
+                ...programmes.map((p) => ({ value: p._id, label: p.name })),
+              ],
+            },
+            classId: {
+              key: 'classId',
+              options: [
+                { label: 'All Classes', value: null },
+                ...classes.map((c) => ({ value: c._id, label: c.name })),
+              ],
+            },
+            status: {
+              key: 'status',
+              options: [
+                { value: null, label: 'All Statuses' },
+                { value: 'Day', label: 'Day' },
+                { value: 'Boarder', label: 'Boarder' },
+              ],
+            },
+            tablet: {
+              key: 'tablet',
+              customValue: (student, received) =>
+                received === null
+                  ? true
+                  : received === true
+                    ? student.tablet
+                      ? true
+                      : false
+                    : !student.tablet
+                      ? true
+                      : false,
+              options: [
+                { label: 'All Tablets', value: null },
+                { label: 'Received', value: true },
+                { label: 'Not Received', value: false },
+              ],
+            },
+          }}
           pageSize={100}
           getRowId={(item) => item._id}
           columns={[
@@ -154,17 +102,11 @@ function StudentsManagement() {
             }
             return defaultData
           }}
-          search={(searchQuery, entry) =>
-            entry.name.toLowerCase().includes(searchQuery.toLowerCase())
-          }
-          dataActions={{
-            onAdd: () => openDialog('add'),
-            onEdit: (item) => openDialog('edit', item),
-            onDelete: (item) => openDialog('delete', item),
-          }}
+          searchTerms={[{ key: 'name' }, { key: 'class' }]}
+          dataActions={{}}
+          showDataActions={false}
         />
       </div>
-      <StudentDialog dialogState={dialogState} closeDialog={closeDialog} />
     </div>
   )
 }
