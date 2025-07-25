@@ -59,6 +59,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
       .nonempty('Name is required')
       .max(100, 'Name must be less than 100 characters'),
     classId: z.string().nonempty('Class is required'),
+    indexNumber: z.string().nonempty('Index number is required'),
     programmeId: z.string().nonempty('Programme is required'),
     status: z.union([z.literal('Day'), z.literal('Boarder')]),
     tabletId: z
@@ -74,6 +75,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
       type === 'edit' && studentObj
         ? {
             name: studentObj.name,
+            indexNumber: studentObj.indexNumber,
             classId: studentObj.classId || '',
             programmeId: studentObj.programmeId || '',
             status: studentObj.status,
@@ -81,6 +83,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
           }
         : {
             name: '',
+            indexNumber: '',
             classId: '',
             programmeId: '',
             status: 'Day',
@@ -148,6 +151,27 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
             </FormItem>
           )}
         />
+
+        <FormField
+          control={form.control}
+          name="indexNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Index Number</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  id="index-number"
+                  placeholder="Enter index number"
+                  className="h-10"
+                  required
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Programme */}
         <FormField
           control={form.control}
