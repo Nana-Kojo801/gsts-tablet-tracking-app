@@ -26,10 +26,6 @@ import { useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
 import { isFriday } from '@/hooks/use-app-data'
 
-interface StudentFormProps {
-  closeDialog: () => void
-}
-
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
@@ -40,7 +36,7 @@ function isToday(date: number) {
   )
 }
 
-const StudentForm = ({ closeDialog }: StudentFormProps) => {
+const StudentForm = () => {
   const { students, submissions } = useAppData()
   const user = useUser()
   const [studentSearch, setStudentSearch] = useState<string | undefined>()
@@ -89,7 +85,6 @@ const StudentForm = ({ closeDialog }: StudentFormProps) => {
       condition: values.tabletCondition,
     }
     await createSubmission.mutateAsync({ entries: [payload] })
-    closeDialog()
   }
 
   const handleStudentBlur = () => {
