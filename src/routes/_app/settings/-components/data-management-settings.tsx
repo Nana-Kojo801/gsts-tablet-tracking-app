@@ -52,7 +52,7 @@ export function DataManagementSettings() {
         .map((row, idx) => {
           // Validation: all required fields must exist
           const requiredFields = [
-            'Index Number',
+            'Index No',
             'Student Name',
             'Programme',
             'Status',
@@ -71,7 +71,7 @@ export function DataManagementSettings() {
           status = status === 'Day' || status === 'Boarder' ? status : 'Day'
           return {
             name: row['Student Name'],
-            indexNumber: row['Index Number'],
+            indexNumber: row['Index No'],
             programme: row['Programme'],
             status,
             class: row['Class'],
