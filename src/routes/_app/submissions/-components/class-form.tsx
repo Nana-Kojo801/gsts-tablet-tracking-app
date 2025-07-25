@@ -25,6 +25,10 @@ import type { Class } from '@/types'
 import { CheckCircle2, Users } from 'lucide-react'
 import { isFriday } from '@/hooks/use-app-data'
 
+type ClassFormProps = {
+  closeDialog: () => void
+}
+
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
@@ -35,7 +39,7 @@ function isToday(date: number) {
   )
 }
 
-const ClassForm = () => {
+const ClassForm = ({ closeDialog }: ClassFormProps) => {
   const { classes, students, submissions } = useAppData()
   const user = useUser()
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)

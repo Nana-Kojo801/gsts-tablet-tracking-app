@@ -26,6 +26,10 @@ import { useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
 import { isFriday } from '@/hooks/use-app-data'
 
+type ClassFormProps = {
+  closeDialog: () => void
+}
+
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
@@ -36,7 +40,7 @@ function isToday(date: number) {
   )
 }
 
-const StudentForm = () => {
+const StudentForm = ({ closeDialog }: ClassFormProps) => {
   const { students, submissions } = useAppData()
   const user = useUser()
   const [studentSearch, setStudentSearch] = useState<string | undefined>()
