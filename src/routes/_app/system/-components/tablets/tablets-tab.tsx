@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Check, AlertTriangle } from 'lucide-react'
 
 const TabletsTab = () => {
-  const { tablets } = useAppData()
+  const { tablets, students } = useAppData()
 
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
@@ -36,11 +36,16 @@ const TabletsTab = () => {
         pageSize={100}
         getRowId={(item) => item._id}
         columns={[
+          { key: 'student', label: 'Student' },
           { key: 'imei', label: 'IMEI' },
           { key: 'bagNumber', label: 'Bag Number' },
           { key: 'status', label: 'Status' },
         ]}
         renderData={({ column, entry, defaultData }) => {
+          if (colum.key === 'student') {
+            const student = students.find(student => student.tablet?.imei === entry.imei)
+            return `${!student ? 'Unknown student' : student.name}`
+          }
           if (column.key === 'status') {
             if (entry.status === 'active') {
               return (
