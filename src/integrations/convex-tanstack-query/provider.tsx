@@ -42,6 +42,7 @@ const queryClient = new QueryClient({
     },
     onError(_error, _variables, _context, mutation) {
       const meta = mutation.options.meta as { errorMessage?: string } | undefined
+      console.log('error', _error)
       const errorMessage = meta?.errorMessage || 'Operation failed'
       toast.custom(() => <ErrorToast message={errorMessage} />)
     },
