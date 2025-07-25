@@ -2,7 +2,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import StudentForm from './student-form';
 import ClassForm from './class-form';
 
-const SubmissionForm = () => {
+const SubmissionForm = ({ closeDialog }: { closeDialog: () => void }) => {
   return (
     <Tabs defaultValue="student" className="w-full">
       <TabsList className="w-full mb-4">
@@ -10,10 +10,10 @@ const SubmissionForm = () => {
         <TabsTrigger value="class">By Class</TabsTrigger>
       </TabsList>
       <TabsContent value="student">
-        <StudentForm />
+        <StudentForm closeDialog={closeDialog} />
       </TabsContent>
       <TabsContent value="class">
-        <ClassForm />
+        <ClassForm closeDialog={closeDialog} />
       </TabsContent>
     </Tabs>
   );
