@@ -102,7 +102,7 @@ function StudentsManagement() {
             }
             return defaultData
           }}
-          searchTerms={[{ key: 'name' }, { key: 'class' }, { term: (entry) => entry.tablet.imei }]}
+          searchTerms={[{ key: 'name' }, { key: 'class' }, { term: (entry) => entry.tablet ? '' : entry.tablet.imei }]}
           dataActions={{}}
           showDataActions={false}
         />
