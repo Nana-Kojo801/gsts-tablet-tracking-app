@@ -40,7 +40,7 @@ const AppSidebar = () => {
         <div className="flex items-center space-x-3">
           <img
             src={Logo}
-            className="w-10 h-10 object-cover shadow-lg"
+            className="w-10 h-10 object-cover"
           />
           <div className="flex-1">
             <div className="text-lg font-bold text-foreground">GSTS</div>
