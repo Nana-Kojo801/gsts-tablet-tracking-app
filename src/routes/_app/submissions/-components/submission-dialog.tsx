@@ -46,11 +46,7 @@ const SubmissionDialog = ({
         </DialogHeader>
         <div className="space-y-4">
           {action === 'add' && (
-            <SubmissionForm
-              type="add"
-              submissionObj={null}
-              closeDialog={closeDialog}
-            />
+            <SubmissionForm />
           )}
           {action === 'delete' && submissionData && (
             <div className="space-y-4">
