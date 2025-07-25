@@ -29,7 +29,7 @@ function StudentsManagement() {
       {/* Students Table */}
       <div className="overflow-x-auto">
         <EntityTable<Student>
-          searchPlaceholder="Search students..."
+          searchPlaceholder="Search by name, imei..."
           entries={students}
           filters={{
             programmeId: {
@@ -102,7 +102,7 @@ function StudentsManagement() {
             }
             return defaultData
           }}
-          searchTerms={[{ key: 'name' }, { key: 'class' }]}
+          searchTerms={[{ key: 'name' }, { key: 'class' }, { term: (entry) => entry.tablet.imei }]}
           dataActions={{}}
           showDataActions={false}
         />
