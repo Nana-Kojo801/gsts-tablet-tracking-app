@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_app')({
   },
   loader: async ({ context: { queryClient } }) => {
     await queryClient.ensureQueryData(convexQuery(api.data.getAllData, {}))
-    document.body.classList.add('app-loaded')
+    setTimeout(() => document.body.classList.add('app-loaded'), 0)
   },
 })
 
