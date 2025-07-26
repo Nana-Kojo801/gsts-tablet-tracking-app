@@ -5,6 +5,8 @@ import type { DialogState } from './-components/types'
 import SubmissionDialog from './-components/submission-dialog'
 import SubmissionsTable from './-components/submissions-table'
 import DashboardStats from './-components/dashboard-stats'
+import { isWeekend } from '@/hooks/use-app-data'
+import { customToast } from '@/components/custom-toast'
 
 export const Route = createFileRoute('/_app/submissions/')({
   component: SubmissionsPage,
@@ -47,8 +49,14 @@ function SubmissionsPage() {
 
       {/* Submissions Table */}
       <div className="overflow-x-auto">
-        <SubmissionsTable 
-          onAdd={() => openDialog('add')}
+        <SubmissionsTable
+          onAdd={() => {
+            if(isWeekend(new Date())) {
+              customToast('Submissions are not allowed on weekends', "error")
+              return
+            }
+            openDialog('add')
+          }}
           onDelete={(item) => openDialog('delete', item)}
         />
       </div>

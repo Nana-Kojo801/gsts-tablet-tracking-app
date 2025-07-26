@@ -2,7 +2,6 @@ import { createFileRoute, redirect } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useConvex } from 'convex/react'
 import { api } from '@convex/_generated/api'
-import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -16,6 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useEffect } from 'react'
+import { customToast } from '@/components/custom-toast'
 
 export const Route = createFileRoute('/_auth/login')({
   component: RouteComponent,
@@ -59,7 +59,7 @@ function RouteComponent() {
       localStorage.setItem('session-userId', user._id)
       window.location.reload()
     } catch(e) {
-      toast.error((e as Error).message || 'Failed to login')
+      customToast((e as Error).message || 'Failed to login', 'error')
     }
   }
 

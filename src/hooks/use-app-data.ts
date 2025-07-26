@@ -7,6 +7,11 @@ export function isFriday(date: Date) {
   return date.getDay() === 5 // 0=Sunday, 5=Friday
 }
 
+export function isWeekend(date: Date) {
+  const day = date.getDay()
+  return day === 0 || day === 6 // 0=Sunday, 6=Saturday
+}
+
 export function getPendingSubmissionStudents(
   date: Date,
   students: Student[],
@@ -16,7 +21,9 @@ export function getPendingSubmissionStudents(
   const dateStr = date.toISOString().slice(0, 10)
   // Only count boarders on Friday
   return students.filter((s) => {
+    if (isWeekend(date)) return false // Skip weekends
     if (!isFri && s.status === 'Boarder') return false
+    if(!s.tablet || (s.tablet && s.tablet.status === "confiscated")) return false
     const hasSubmitted = submissions.some(
       (sub) =>
         sub.studentId === s._id &&
