@@ -279,7 +279,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                     className="h-10 pl-9"
                   />
                   {showTabletDropdown && (
-                    <div className="absolute z-20 bg-white border border-primary/20 rounded-lg w-full max-h-40 overflow-y-auto shadow-2xl mt-1 animate-fade-in p-1">
+                    <div className="absolute z-20 bg-white dark:bg-muted border border-primary/20 dark:border-border rounded-lg w-full max-h-40 overflow-y-auto shadow-2xl mt-1 animate-fade-in p-1">
                       {matchingTablets.length === 0 ? (
                         <div className="px-3 py-2 text-xs text-muted-foreground text-center select-none">
                           No tablets found

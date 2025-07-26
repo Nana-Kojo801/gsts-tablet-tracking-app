@@ -201,19 +201,29 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
                 This student has already submitted today.
               </div>
             )}
-            {selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday && (
-              <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
-                <User className="w-4 h-4" />
-                Boarders can only submit on Friday.
-              </div>
-            )}
+            {selectedStudent &&
+              selectedStudent.tablet &&
+              selectedStudent.tablet.status === 'confiscated' && (
+                <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                  <User className="w-4 h-4" />
+                  This student's tablet has been confiscated
+                </div>
+              )}
+            {selectedStudent &&
+              selectedStudent.status === 'Boarder' &&
+              !todayIsFriday && (
+                <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                  <User className="w-4 h-4" />
+                  Boarders can only submit on Friday.
+                </div>
+              )}
           </>
         )}
         <FormField
           control={form.control}
           name="tabletCondition"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className='mt-4'>
               <FormLabel>Tablet Condition</FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
@@ -237,19 +247,25 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
             disabled={
               createSubmission.isPending ||
               !!hasSubmittedToday ||
+              selectedStudent === null ||
               !!(selectedStudent && !selectedStudent.tablet) ||
-              (!!selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday)
+              (selectedStudent && selectedStudent.tablet && selectedStudent.tablet.status === "confiscated") ||
+              (!!selectedStudent &&
+                selectedStudent.status === 'Boarder' &&
+                !todayIsFriday)
             }
           >
-            {!selectedStudent?.tablet
+            {selectedStudent && !selectedStudent.tablet
               ? 'No Tablet'
               : hasSubmittedToday
-              ? 'Already Submitted'
-              : (!!selectedStudent && selectedStudent.status === 'Boarder' && !todayIsFriday)
-              ? 'Boarders submit on Friday'
-              : createSubmission.isPending
-              ? 'Submitting...'
-              : 'Submit Collection'}
+                ? 'Already Submitted'
+                : !!selectedStudent &&
+                    selectedStudent.status === 'Boarder' &&
+                    !todayIsFriday
+                  ? 'Boarders submit on Friday'
+                  : createSubmission.isPending
+                    ? 'Submitting...'
+                    : 'Submit Collection'}
           </Button>
           <Button
             onClick={closeDialog}

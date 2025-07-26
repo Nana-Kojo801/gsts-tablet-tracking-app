@@ -94,6 +94,7 @@ export function DataManagementSettings() {
   const handleExportData = () => {
     const data = students.map((s) => ({
       'Student Name': s.name,
+      'Index No': s.indexNumber,
       Programme: s.programme,
       Status: s.status,
       Class: s.class,
@@ -101,7 +102,17 @@ export function DataManagementSettings() {
       'IMEI Number': s.tablet ? s.tablet.imei : '',
     }))
     const wb = XLSX.utils.book_new()
-    const ws = XLSX.utils.json_to_sheet(data)
+    const ws = XLSX.utils.json_to_sheet(data, {
+      header: [
+        'Student Name',
+        'Index No',
+        'Programme',
+        'Status',
+        'Class',
+        'Bag Number',
+        'IMEI Number',
+      ],
+    })
     XLSX.utils.book_append_sheet(wb, ws, `MASTER DATA`)
     XLSX.writeFile(wb, `BACKUP-${crypto.randomUUID()}}.xlsx`)
   }
