@@ -1,16 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import AppSidebar from '@/components/app-sidebar'
-import {
-  fetchClassesQueryOptions,
-  fetchProgrammesQueryOptions,
-  fetchStudentsQueryOptions,
-  fetchSubmissionsQueryOptions,
-  fetchTabletsQueryOptions,
-  fetchUsersQueryOptions,
-} from '@/queries'
 import { useIsMobile } from '@/hooks/use-mobile'
 import NotFound from '@/components/not-found'
 import ErrorPage from '@/components/error-page'
+import { convexQuery } from '@convex-dev/react-query'
+import { api } from '@convex/_generated/api'
 
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
@@ -20,14 +14,8 @@ export const Route = createFileRoute('/_app')({
     if (!context.user) throw redirect({ to: '/login' })
   },
   loader: async ({ context: { queryClient } }) => {
-    await Promise.all([
-      queryClient.ensureQueryData(fetchClassesQueryOptions()),
-      queryClient.ensureQueryData(fetchStudentsQueryOptions()),
-      queryClient.ensureQueryData(fetchProgrammesQueryOptions()),
-      queryClient.ensureQueryData(fetchTabletsQueryOptions()),
-      queryClient.ensureQueryData(fetchUsersQueryOptions()),
-      queryClient.ensureQueryData(fetchSubmissionsQueryOptions())
-    ])
+    await queryClient.ensureQueryData(convexQuery(api.data.getAllData, {}))
+    document.body.classList.add('app-loaded')
   },
 })
 
@@ -41,9 +29,7 @@ function AppLayout() {
       {/* Main Content */}
       <div
         className={
-          isMobile
-            ? 'flex flex-col'
-            : 'flex flex-col' + ' pl-65' // padding left for sidebar width
+          isMobile ? 'flex flex-col' : 'flex flex-col' + ' pl-65' // padding left for sidebar width
         }
       >
         {/* Page Content */}

@@ -1,20 +1,85 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/favicon.ico" />
     <meta name="theme-color" content="#7c2232" />
-    <meta
-      name="description"
-      content="App created to manage student tablets"
-    />
+    <meta name="description" content="App created to manage student tablets" />
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>GSTS Tablet Management App</title>
   </head>
-  <body>
-    <div id="app"></div>
+  <body
+    style="
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family:
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    "
+  >
+    <div
+      id="loading-screen"
+      style="
+        width: 100vw;
+        height: 100dvh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: oklch(0.98 0.01 15);
+      "
+    >
+      <img
+        id="loading-logo"
+        src="/icon-144x144.png"
+        alt="Logo"
+        style="object-fit: cover; width: 90px; height: 90px"
+      />
+      <h1
+        id="loading-title"
+        style="
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: oklch(0.5 0.015 15);
+          margin-top: 1rem;
+          line-height: 2rem;
+          margin: 1rem 0 0 0;
+        "
+      >
+        GSTS Tablet System
+      </h1>
+    </div>
+
+    <div id="app" style="display: none"></div>
+
+    <style>
+      /* Only styles that can't be inlined */
+      * {
+        box-sizing: border-box;
+      }
+
+      /* Dark mode detection */
+      @media (prefers-color-scheme: dark) {
+        #loading-screen {
+          background-color: oklch(0.16 0.01 15) !important;
+        }
+        #loading-title {
+          color: oklch(0.8 0.02 15) !important;
+        }
+      }
+
+      /* App state management */
+      .app-loaded #loading-screen {
+        display: none !important;
+      }
+
+      .app-loaded #app {
+        display: block !important;
+      }
+    </style>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
