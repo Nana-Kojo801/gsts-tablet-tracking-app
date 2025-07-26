@@ -5,6 +5,7 @@ import NotFound from '@/components/not-found'
 import ErrorPage from '@/components/error-page'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '@convex/_generated/api'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/_app')({
   component: AppLayout,
@@ -15,12 +16,16 @@ export const Route = createFileRoute('/_app')({
   },
   loader: async ({ context: { queryClient } }) => {
     await queryClient.ensureQueryData(convexQuery(api.data.getAllData, {}))
-    setTimeout(() => document.body.classList.add('app-loaded'), 0)
   },
 })
 
 function AppLayout() {
   const isMobile = useIsMobile()
+
+  useEffect(() => {
+    document.body.classList.add('app-loaded')
+  }, [])
+
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-background via-background to-muted/20 relative">
       {/* Sidebar (fixed) */}

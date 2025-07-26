@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useConvex } from 'convex/react'
 import { api } from '@convex/_generated/api'
@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/_auth/login')({
   component: RouteComponent,
@@ -35,7 +36,6 @@ type LoginFormValues = z.infer<typeof loginSchema>
 
 function RouteComponent() {
   const convex = useConvex()
-  const navigate = useNavigate()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -57,11 +57,15 @@ function RouteComponent() {
         throw Error('Username or password is incorrect')
       }
       localStorage.setItem('session-userId', user._id)
-      navigate({ to: '/'})
+      window.location.reload()
     } catch(e) {
       toast.error((e as Error).message || 'Failed to login')
     }
   }
+
+  useEffect(() => {
+    document.body.classList.add('app-loaded')
+  }, [])
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-2 sm:p-4 relative overflow-hidden">
