@@ -10,76 +10,63 @@
     <link rel="manifest" href="/manifest.json" />
     <title>GSTS Tablet Management App</title>
   </head>
-  <body
-    style="
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family:
-        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    "
-  >
-    <div
-      id="loading-screen"
-      style="
-        width: 100vw;
-        height: 100dvh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        background-color: oklch(0.98 0.01 15);
-      "
-    >
-      <img
-        id="loading-logo"
-        src="/icon-144x144.png"
-        alt="Logo"
-        style="object-fit: cover; width: 90px; height: 90px"
-      />
-      <h1
-        id="loading-title"
-        style="
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: oklch(0.5 0.015 15);
-          margin-top: 1rem;
-          line-height: 2rem;
-          margin: 1rem 0 0 0;
-        "
-      >
-        GSTS Tablet System
-      </h1>
+  <body style="margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+    
+    <div id="loading-screen" style="width: 100vw; height: 100dvh; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+      <img id="loading-logo" src="/icon-144x144.png" alt="Logo" style="object-fit: cover; width: 90px; height: 90px;" />
+      <h1 id="loading-title" style="font-size: 1.5rem; font-weight: 700; margin-top: 1rem; line-height: 2rem; margin: 1rem 0 0 0;">GSTS Tablet System</h1>
     </div>
-
-    <div id="app" style="display: none"></div>
-
+    
+    <div id="app" style="display: none;"></div>
+    
     <style>
       /* Only styles that can't be inlined */
       * {
         box-sizing: border-box;
       }
-
-      /* Dark mode detection */
-      @media (prefers-color-scheme: dark) {
-        #loading-screen {
-          background-color: oklch(0.16 0.01 15) !important;
-        }
-        #loading-title {
-          color: oklch(0.8 0.02 15) !important;
-        }
-      }
-
+      
       /* App state management */
       .app-loaded #loading-screen {
         display: none !important;
       }
-
+      
       .app-loaded #app {
         display: block !important;
       }
     </style>
-
+    
+    <script>
+      // Apply user's theme from localStorage immediately
+      (function() {
+        const theme = localStorage.getItem('vite-ui-theme') || 'system';
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        let isDark = false;
+        if (theme === 'dark') {
+          isDark = true;
+        } else if (theme === 'light') {
+          isDark = false;
+        } else { // system
+          isDark = systemDark;
+        }
+        
+        const loadingScreen = document.getElementById('loading-screen');
+        const loadingTitle = document.getElementById('loading-title');
+        
+        if (isDark) {
+          // Dark theme colors
+          loadingScreen.style.backgroundColor = 'oklch(0.16 0.01 15)';
+          loadingTitle.style.color = 'oklch(0.8 0.02 15)';
+          document.documentElement.classList.add('dark');
+        } else {
+          // Light theme colors
+          loadingScreen.style.backgroundColor = 'oklch(0.98 0.01 15)';
+          loadingTitle.style.color = 'oklch(0.5 0.015 15)';
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+    
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
