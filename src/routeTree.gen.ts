@@ -18,6 +18,7 @@ import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/ind
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
 import { Route as AppRecentSubmissionsIndexRouteImport } from './routes/_app/recent-submissions/index'
+import { Route as AppConfiscationsIndexRouteImport } from './routes/_app/confiscations/index'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -64,10 +65,16 @@ const AppRecentSubmissionsIndexRoute =
     path: '/recent-submissions/',
     getParentRoute: () => AppRoute,
   } as any)
+const AppConfiscationsIndexRoute = AppConfiscationsIndexRouteImport.update({
+  id: '/confiscations/',
+  path: '/confiscations/',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/confiscations': typeof AppConfiscationsIndexRoute
   '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
+  '/confiscations': typeof AppConfiscationsIndexRoute
   '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
@@ -90,6 +98,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/confiscations/': typeof AppConfiscationsIndexRoute
   '/_app/recent-submissions/': typeof AppRecentSubmissionsIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
   '/_app/settings/': typeof AppSettingsIndexRoute
@@ -102,6 +111,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/login'
     | '/'
+    | '/confiscations'
     | '/recent-submissions'
     | '/reports'
     | '/settings'
@@ -112,6 +122,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/'
+    | '/confiscations'
     | '/recent-submissions'
     | '/reports'
     | '/settings'
@@ -123,6 +134,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth/login'
     | '/_app/'
+    | '/_app/confiscations/'
     | '/_app/recent-submissions/'
     | '/_app/reports/'
     | '/_app/settings/'
@@ -201,11 +213,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRecentSubmissionsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/confiscations/': {
+      id: '/_app/confiscations/'
+      path: '/confiscations'
+      fullPath: '/confiscations'
+      preLoaderRoute: typeof AppConfiscationsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
+  AppConfiscationsIndexRoute: typeof AppConfiscationsIndexRoute
   AppRecentSubmissionsIndexRoute: typeof AppRecentSubmissionsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
@@ -216,6 +236,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
+  AppConfiscationsIndexRoute: AppConfiscationsIndexRoute,
   AppRecentSubmissionsIndexRoute: AppRecentSubmissionsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,

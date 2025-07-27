@@ -4,6 +4,7 @@ import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 import { TabletIcon, Ban } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import ConfiscationSection from './-components/confiscation-section'
 
 export const Route = createFileRoute('/_app/students/')({
   component: StudentsManagement,
@@ -25,6 +26,9 @@ function StudentsManagement() {
           </p>
         </div>
       </div>
+
+      {/* I want a small section that just shows confiscated devices and a view all confiscations */}
+      <ConfiscationSection />
 
       {/* Students Table */}
       <div className="overflow-x-auto">
