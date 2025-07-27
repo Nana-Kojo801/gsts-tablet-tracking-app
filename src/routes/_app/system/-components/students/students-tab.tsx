@@ -5,7 +5,7 @@ import StudentDialog from './student-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
 import { useAppData } from '@/hooks/use-app-data'
 import { Badge } from '@/components/ui/badge'
-import { Tablet as TabletIcon } from 'lucide-react'
+import { Ban, Tablet as TabletIcon } from 'lucide-react'
 
 const StudentsTab = () => {
   const { students, programmes, classes } = useAppData()
@@ -42,27 +42,36 @@ const StudentsTab = () => {
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'tablet') {
-            if (entry.tabletId) {
+            if (entry.tablet && entry.tablet.status === 'confiscated') {
               return (
-                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
-                  <TabletIcon className="w-4 h-4 mr-1 text-green-600" />
-                  Received
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
+                  <Ban className="w-4 h-4 mr-1 text-orange-600" />
+                  Confiscated
                 </Badge>
               )
             } else {
-              return (
-                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-muted/40 border-border text-muted-foreground">
-                  <span className="w-4 h-4 mr-1">—</span>
-                  Not Received
-                </Badge>
-              )
+              if (entry.tabletId) {
+                return (
+                  <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
+                    <TabletIcon className="w-4 h-4 mr-1 text-green-600" />
+                    Received
+                  </Badge>
+                )
+              } else {
+                return (
+                  <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-muted/40 border-border text-muted-foreground">
+                    <span className="w-4 h-4 mr-1">—</span>
+                    Not Received
+                  </Badge>
+                )
+              }
             }
           }
           return defaultData
         }}
         searchTerms={[
           { key: 'name' },
-          { term: (entry) => !entry.tablet ? '' : entry.tablet.imei },
+          { term: (entry) => (!entry.tablet ? '' : entry.tablet.imei) },
           { key: 'indexNumber' },
         ]}
         dataActions={{
@@ -101,7 +110,15 @@ const StudentsTab = () => {
             key: 'tablet',
             label: 'Tablet Status',
             customValue: (student, received) =>
-              received === null ? true : received === true ? student.tablet ? true : false : !student.tablet ? true : false,
+              received === null
+                ? true
+                : received === true
+                  ? student.tablet
+                    ? true
+                    : false
+                  : !student.tablet
+                    ? true
+                    : false,
             options: [
               { label: 'All Tablets', value: null },
               { label: 'Received', value: true },

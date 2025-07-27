@@ -50,7 +50,8 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
     ? students.filter(
         (s) =>
           s.name.toLowerCase().includes(studentSearch.toLowerCase()) ||
-          s.class?.toLowerCase().includes(studentSearch.toLowerCase()),
+          s.indexNumber.toLowerCase().includes(studentSearch.toLowerCase()) ||
+          s.tablet?.imei.toLowerCase().includes(studentSearch.toLowerCase()),
       )
     : students
 
@@ -114,7 +115,7 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
                     <Search className="w-4 h-4" />
                   </span>
                   <Input
-                    placeholder="Search student by name or class..."
+                    placeholder="Search student by name, index no, imei no..."
                     value={
                       selectedStudent
                         ? selectedStudent.name
@@ -204,7 +205,7 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
             {selectedStudent &&
               selectedStudent.tablet &&
               selectedStudent.tablet.status === 'confiscated' && (
-                <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
+                <div className="flex items-center gap-2 p-2 rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold mb-4">
                   <User className="w-4 h-4" />
                   This student's tablet has been confiscated
                 </div>

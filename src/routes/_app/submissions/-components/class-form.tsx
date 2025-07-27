@@ -76,12 +76,17 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
   const noOneWithTablet = studentsWithTablet.length === 0
 
   // For each student with a tablet, check if they have submitted today
-  const studentsWhoHaveNotSubmitted = studentsWithTablet.filter(
-    (student) =>
-      !submissions.some(
-        (s) => s.studentId === student._id && isToday(s.submissionTime),
-      ),
-  )
+  const studentsWhoHaveNotSubmitted = studentsWithTablet
+    .filter((s) => s.tablet && s.tablet.status !== 'confiscated')
+    .filter(
+      (student) =>
+        !submissions.some(
+          (s) => s.studentId === student._id && isToday(s.submissionTime),
+        ),
+    )
+  const studentsWithConfiscatedTablets = studentsWithTablet.filter(
+    (s) => s.tablet && s.tablet.status === 'confiscated',
+  ).length
   // Exclude boarders from pending if not Friday
   const studentsWhoCanSubmit = todayIsFriday
     ? studentsWhoHaveNotSubmitted
@@ -166,6 +171,14 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
             </div>
             {/* Submission info */}
             <div className="w-full mb-4">
+              {selectedClass && studentsWithConfiscatedTablets > 0 && (
+                <div className="flex items-center gap-2 p-2 rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold mb-4">
+                  <Users className="w-4 h-4" />
+                  {studentsWithConfiscatedTablets} student
+                  {studentsWithConfiscatedTablets !== 1 ? 's' : ''} in this
+                  class have a confiscated tablet.
+                </div>
+              )}
               {allSubmitted ? (
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-2 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
