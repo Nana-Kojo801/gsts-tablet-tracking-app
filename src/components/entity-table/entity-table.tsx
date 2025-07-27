@@ -36,6 +36,7 @@ export interface EntityTableProps<T, IdType = unknown> {
   filters?: {
     [key: string]: {
       key: keyof T
+      label: string;
       customValue?: (entry: T, value: any) => boolean
       options: { label: string; value: any }[]
     }
@@ -122,13 +123,12 @@ const EntityTable = <T, IdType = unknown>({
 
   return (
     <div className="space-y-4">
-      {/* Search, Filters, and Actions */}
+      {/* Search and Actions */}
       <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl p-5 shadow-lg">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex flex-1 gap-3 items-center">
-            {/* Filters */}
             {/* Search */}
-            <div className="relative w-full max-w-xs">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder={searchPlaceholder}
@@ -137,32 +137,6 @@ const EntityTable = <T, IdType = unknown>({
                 className="pl-10"
               />
             </div>
-            {Object.keys.length > 0 && (
-              <div className="flex gap-2">
-                {Object.entries(filters).map(([key, filters]) => {
-                  return (
-                    <Select
-                      key={key}
-                      value={filter[filters.key as string]}
-                      onValueChange={(value) => {
-                        setFilter((prev) => ({ ...prev, [filters.key]: value }))
-                      }}
-                    >
-                      <SelectTrigger className="w-36">
-                        <SelectValue placeholder={filter.label} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {filters.options.map((opt, index) => (
-                          <SelectItem key={index} value={opt.value}>
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )
-                })}
-              </div>
-            )}
           </div>
           <div className="flex gap-2 items-center justify-end">
             {dataActions.onImport && (
@@ -192,6 +166,38 @@ const EntityTable = <T, IdType = unknown>({
             )}
           </div>
         </div>
+        
+        {/* Filters - Now in its own row below search and actions */}
+        {Object.keys(filters).length > 0 && (
+          <div className="flex gap-4 mt-4 pt-4 border-t border-border/50">
+            {Object.entries(filters).map(([key, filterConfig]) => {
+              return (
+                <div key={key} className="flex flex-col gap-2">
+                  <label className="text-sm font-medium text-foreground">
+                    {filterConfig.label}
+                  </label>
+                  <Select
+                    value={filter[filterConfig.key as string]}
+                    onValueChange={(value) => {
+                      setFilter((prev) => ({ ...prev, [filterConfig.key]: value }))
+                    }}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Select..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterConfig.options.map((opt, index) => (
+                        <SelectItem key={index} value={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* Data Table */}
@@ -265,5 +271,4 @@ const EntityTable = <T, IdType = unknown>({
     </div>
   )
 }
-
 export default EntityTable

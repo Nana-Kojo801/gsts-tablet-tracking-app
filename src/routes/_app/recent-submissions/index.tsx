@@ -73,6 +73,7 @@ function RecentSubmissions() {
         filters={{
           class: {
             key: 'class',
+            label: 'Class',
             options: [
               { value: null, label: 'All Classes' },
               ...classes.map((c) => ({ value: c.name === '' ? 'Unassigned' : c.name, label: c.name })),
@@ -80,6 +81,7 @@ function RecentSubmissions() {
           },
           programme: {
             key: 'programme',
+            label: 'Programme',
             options: [
               { value: null, label: 'All Programmes' },
               ...programmes.map((p) => ({ value: p.name, label: p.name })),

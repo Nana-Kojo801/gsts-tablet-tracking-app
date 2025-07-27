@@ -79,10 +79,12 @@ const TabletsTab = () => {
         filters={{
           status: {
             key: 'status',
+            label: 'Status',
             options: [
               { label: 'All', value: null },
               { label: 'Active', value: 'active' },
               { label: 'Lost', value: 'lost' },
+              { label: 'Confiscated', value: 'confiscated' },
             ],
           },
         }}

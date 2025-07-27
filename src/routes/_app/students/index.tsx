@@ -34,6 +34,7 @@ function StudentsManagement() {
           filters={{
             programmeId: {
               key: 'programmeId',
+              label: 'Programme',
               options: [
                 { label: 'All programmes', value: null },
                 ...programmes.map((p) => ({ value: p._id, label: p.name })),
@@ -41,6 +42,7 @@ function StudentsManagement() {
             },
             classId: {
               key: 'classId',
+              label: 'Class',
               options: [
                 { label: 'All Classes', value: null },
                 ...classes.map((c) => ({ value: c._id, label: c.name })),
@@ -48,6 +50,7 @@ function StudentsManagement() {
             },
             status: {
               key: 'status',
+              label: 'Status',
               options: [
                 { value: null, label: 'All Statuses' },
                 { value: 'Day', label: 'Day' },
@@ -56,6 +59,7 @@ function StudentsManagement() {
             },
             tablet: {
               key: 'tablet',
+              label: 'Tablet Status',
               customValue: (student, received) =>
                 received === null
                   ? true

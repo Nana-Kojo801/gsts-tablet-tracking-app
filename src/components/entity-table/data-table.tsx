@@ -20,7 +20,7 @@ const DataTable = <T, IdType = unknown>({
   renderData,
 }: DataTableProps<T, IdType>) => {
   return (
-    <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl shadow-lg">
+    <div className="bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl overflow-x-hidden shadow-lg">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[500px]">
           <thead>
