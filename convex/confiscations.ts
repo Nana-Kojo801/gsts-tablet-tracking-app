@@ -1,6 +1,6 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
-import { confiscationStatus, tabletStatus } from './shared/validators'
+import { confiscationStatus } from './shared/validators'
 
 export const getAll = query({
   handler: async (ctx) => {
