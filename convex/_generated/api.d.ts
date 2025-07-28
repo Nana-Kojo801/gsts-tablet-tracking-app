@@ -14,8 +14,10 @@ import type {
   FunctionReference,
 } from "convex/server";
 import type * as classes from "../classes.js";
+import type * as confiscations from "../confiscations.js";
 import type * as data from "../data.js";
 import type * as models_classes_classTable from "../models/classes/classTable.js";
+import type * as models_confiscations from "../models/confiscations.js";
 import type * as models_programmes_programmeTable from "../models/programmes/programmeTable.js";
 import type * as models_students_studentTable from "../models/students/studentTable.js";
 import type * as models_submissions_submissionTable from "../models/submissions/submissionTable.js";
@@ -39,8 +41,10 @@ import type * as users from "../users.js";
  */
 declare const fullApi: ApiFromModules<{
   classes: typeof classes;
+  confiscations: typeof confiscations;
   data: typeof data;
   "models/classes/classTable": typeof models_classes_classTable;
+  "models/confiscations": typeof models_confiscations;
   "models/programmes/programmeTable": typeof models_programmes_programmeTable;
   "models/students/studentTable": typeof models_students_studentTable;
   "models/submissions/submissionTable": typeof models_submissions_submissionTable;

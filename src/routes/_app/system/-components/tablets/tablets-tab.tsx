@@ -3,19 +3,18 @@ import type { Tablet } from '@/types'
 import type { DialogState } from './types'
 import TabletDialog from './tablet-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
-import { useAppData } from '@/hooks/use-app-data'
+import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
 import { Badge } from '@/components/ui/badge'
 import { Check, AlertTriangle, Ban } from 'lucide-react'
 
 const TabletsTab = () => {
-  const { tablets, students } = useAppData()
+  const { tablets, students, confiscations } = useAppData()
 
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     action: null,
     tabletObj: null,
   })
-
 
   // Helper functions
   const openDialog = (
@@ -43,11 +42,25 @@ const TabletsTab = () => {
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'student') {
-            const student = students.find(student => student.tablet?.imei === entry.imei)
+            const student = students.find(
+              (student) => student.tablet?.imei === entry.imei,
+            )
             return `${!student ? 'Unknown student' : student.name}`
           }
           if (column.key === 'status') {
-            if (entry.status === 'active') {
+            if (
+              isConfiscatedTablet(
+                confiscations,
+                students.find((s) => s.tablet?.imei === entry.imei)!,
+              )
+            ) {
+              return (
+                <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
+                  <Ban className="w-4 h-4 mr-1 text-orange-600" />
+                  Confiscated
+                </Badge>
+              )
+            } else if (entry.status === 'active') {
               return (
                 <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-green-500/10 border-green-500 text-green-700">
                   <Check className="w-4 h-4 mr-1 text-green-600" />
@@ -61,11 +74,6 @@ const TabletsTab = () => {
                   Lost
                 </Badge>
               )
-            } else if (entry.status === 'confiscated') {
-              return <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
-                <Ban className="w-4 h-4 mr-1 text-orange-600" />
-                Confiscated
-              </Badge>
             }
           }
           return defaultData
@@ -80,6 +88,18 @@ const TabletsTab = () => {
           status: {
             key: 'status',
             label: 'Status',
+            customValue: (entry, value) =>
+              value === null
+                ? true
+                : value === 'active' && entry.status === 'active'
+                  ? true
+                  : value === 'lost' && entry.status === 'lost'
+                    ? true
+                    : value === 'confiscated' &&
+                      isConfiscatedTablet(
+                        confiscations,
+                        students.find((s) => s.tablet?.imei === entry.imei)!,
+                      ),
             options: [
               { label: 'All', value: null },
               { label: 'Active', value: 'active' },

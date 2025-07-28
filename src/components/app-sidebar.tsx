@@ -8,6 +8,7 @@ import {
   LogOut,
   Monitor,
   PanelLeft,
+  Ban,
 } from 'lucide-react'
 import { Button } from './ui/button'
 import { Link, useNavigate } from '@tanstack/react-router'
@@ -21,6 +22,7 @@ const navigationItems = [
   { name: 'Dashboard', icon: LayoutDashboard, href: '/' },
   { name: 'Students', icon: Users, href: '/students' },
   { name: 'Submissions', icon: Inbox, href: '/submissions' },
+  { name: 'Confiscations', icon: Ban, href: '/confiscations' },
   { name: 'Reports', icon: BarChart3, href: '/reports' },
   { name: 'System', icon: Monitor, href: '/system' },
   { name: 'Settings', icon: Settings, href: '/settings' },

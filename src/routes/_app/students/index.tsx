@@ -1,17 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
 import type { Student } from '@/types'
 import EntityTable from '@/components/entity-table/entity-table'
-import { useAppData } from '@/hooks/use-app-data'
+import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
 import { TabletIcon, Ban } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
-import ConfiscationSection from './-components/confiscation-section'
 
 export const Route = createFileRoute('/_app/students/')({
   component: StudentsManagement,
 })
 
 function StudentsManagement() {
-  const { students, classes, programmes } = useAppData()
+  const { students, classes, programmes, confiscations } = useAppData()
 
   return (
     <div className="animate-in fade-in-20 slide-in-from-bottom-8 duration-500 space-y-6 p-2 sm:p-6">
@@ -26,9 +25,6 @@ function StudentsManagement() {
           </p>
         </div>
       </div>
-
-      {/* I want a small section that just shows confiscated devices and a view all confiscations */}
-      <ConfiscationSection />
 
       {/* Students Table */}
       <div className="overflow-x-auto">
@@ -64,20 +60,20 @@ function StudentsManagement() {
             tablet: {
               key: 'tablet',
               label: 'Tablet Status',
-              customValue: (student, received) =>
-                received === null
+              customValue: (student, value) =>
+                value === null
                   ? true
-                  : received === true
-                    ? student.tablet
+                  : value === 'received' && student.tabletId
+                    ? true
+                    : value === 'not received' && !student.tabletId
                       ? true
-                      : false
-                    : !student.tablet
-                      ? true
-                      : false,
+                      : value === 'confiscated' &&
+                        isConfiscatedTablet(confiscations, student),
               options: [
                 { label: 'All Tablets', value: null },
-                { label: 'Received', value: true },
-                { label: 'Not Received', value: false },
+                { label: 'Received', value: 'received' },
+                { label: 'Not Received', value: 'not received' },
+                { label: 'Confiscated', value: 'confiscated' },
               ],
             },
           }}
@@ -93,11 +89,13 @@ function StudentsManagement() {
           ]}
           renderData={({ column, entry, defaultData }) => {
             if (column.key === 'tablet') {
-              if (entry.tablet && entry.tablet.status === 'confiscated') {
-                return <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
-                  <Ban className="w-4 h-4 mr-1 text-orange-600" />
-                  Confiscated
-                </Badge>
+              if (entry.tablet && isConfiscatedTablet(confiscations, entry)) {
+                return (
+                  <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
+                    <Ban className="w-4 h-4 mr-1 text-orange-600" />
+                    Confiscated
+                  </Badge>
+                )
               } else {
                 if (entry.tabletId) {
                   return (
@@ -118,7 +116,12 @@ function StudentsManagement() {
             }
             return defaultData
           }}
-          searchTerms={[{ key: 'name' }, { key: 'class' }, { term: (entry) => !entry.tablet ? '' : entry.tablet.imei }, { key: 'indexNumber' }]}
+          searchTerms={[
+            { key: 'name' },
+            { key: 'class' },
+            { term: (entry) => (!entry.tablet ? '' : entry.tablet.imei) },
+            { key: 'indexNumber' },
+          ]}
           dataActions={{}}
           showDataActions={false}
         />

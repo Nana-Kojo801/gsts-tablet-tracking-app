@@ -17,7 +17,6 @@ import { Route as AppSubmissionsIndexRouteImport } from './routes/_app/submissio
 import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/index'
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
-import { Route as AppRecentSubmissionsIndexRouteImport } from './routes/_app/recent-submissions/index'
 import { Route as AppConfiscationsIndexRouteImport } from './routes/_app/confiscations/index'
 
 const AppRoute = AppRouteImport.update({
@@ -59,12 +58,6 @@ const AppReportsIndexRoute = AppReportsIndexRouteImport.update({
   path: '/reports/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppRecentSubmissionsIndexRoute =
-  AppRecentSubmissionsIndexRouteImport.update({
-    id: '/recent-submissions/',
-    path: '/recent-submissions/',
-    getParentRoute: () => AppRoute,
-  } as any)
 const AppConfiscationsIndexRoute = AppConfiscationsIndexRouteImport.update({
   id: '/confiscations/',
   path: '/confiscations/',
@@ -75,7 +68,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
   '/confiscations': typeof AppConfiscationsIndexRoute
-  '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
@@ -86,7 +78,6 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/': typeof AppIndexRoute
   '/confiscations': typeof AppConfiscationsIndexRoute
-  '/recent-submissions': typeof AppRecentSubmissionsIndexRoute
   '/reports': typeof AppReportsIndexRoute
   '/settings': typeof AppSettingsIndexRoute
   '/students': typeof AppStudentsIndexRoute
@@ -99,7 +90,6 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_app/': typeof AppIndexRoute
   '/_app/confiscations/': typeof AppConfiscationsIndexRoute
-  '/_app/recent-submissions/': typeof AppRecentSubmissionsIndexRoute
   '/_app/reports/': typeof AppReportsIndexRoute
   '/_app/settings/': typeof AppSettingsIndexRoute
   '/_app/students/': typeof AppStudentsIndexRoute
@@ -112,7 +102,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/'
     | '/confiscations'
-    | '/recent-submissions'
     | '/reports'
     | '/settings'
     | '/students'
@@ -123,7 +112,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/'
     | '/confiscations'
-    | '/recent-submissions'
     | '/reports'
     | '/settings'
     | '/students'
@@ -135,7 +123,6 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_app/'
     | '/_app/confiscations/'
-    | '/_app/recent-submissions/'
     | '/_app/reports/'
     | '/_app/settings/'
     | '/_app/students/'
@@ -206,13 +193,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppReportsIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/recent-submissions/': {
-      id: '/_app/recent-submissions/'
-      path: '/recent-submissions'
-      fullPath: '/recent-submissions'
-      preLoaderRoute: typeof AppRecentSubmissionsIndexRouteImport
-      parentRoute: typeof AppRoute
-    }
     '/_app/confiscations/': {
       id: '/_app/confiscations/'
       path: '/confiscations'
@@ -226,7 +206,6 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppIndexRoute: typeof AppIndexRoute
   AppConfiscationsIndexRoute: typeof AppConfiscationsIndexRoute
-  AppRecentSubmissionsIndexRoute: typeof AppRecentSubmissionsIndexRoute
   AppReportsIndexRoute: typeof AppReportsIndexRoute
   AppSettingsIndexRoute: typeof AppSettingsIndexRoute
   AppStudentsIndexRoute: typeof AppStudentsIndexRoute
@@ -237,7 +216,6 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppConfiscationsIndexRoute: AppConfiscationsIndexRoute,
-  AppRecentSubmissionsIndexRoute: AppRecentSubmissionsIndexRoute,
   AppReportsIndexRoute: AppReportsIndexRoute,
   AppSettingsIndexRoute: AppSettingsIndexRoute,
   AppStudentsIndexRoute: AppStudentsIndexRoute,

@@ -19,7 +19,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { useCreateSubmissionMutation } from '@/mutations'
-import { useAppData } from '@/hooks/use-app-data'
+import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
 import { useUser } from '@/hooks/user-user'
 import type { Class } from '@/types'
 import { CheckCircle2, Users } from 'lucide-react'
@@ -40,7 +40,7 @@ function isToday(date: number) {
 }
 
 const ClassForm = ({ closeDialog }: ClassFormProps) => {
-  const { classes, students, submissions } = useAppData()
+  const { classes, students, submissions, confiscations } = useAppData()
   const user = useUser()
   const [selectedClass, setSelectedClass] = useState<Class | null>(null)
 
@@ -84,8 +84,8 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
           (s) => s.studentId === student._id && isToday(s.submissionTime),
         ),
     )
-  const studentsWithConfiscatedTablets = studentsWithTablet.filter(
-    (s) => s.tablet && s.tablet.status === 'confiscated',
+  const studentsWithConfiscatedTablets = studentsWithTablet.filter((s) =>
+    isConfiscatedTablet(confiscations, s),
   ).length
   // Exclude boarders from pending if not Friday
   const studentsWhoCanSubmit = todayIsFriday

@@ -19,30 +19,29 @@ import {
 } from '@/components/ui/select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
-import { Search, User, CheckCircle2 } from 'lucide-react'
-import { useCreateSubmissionMutation } from '@/mutations'
+import { Search, User } from 'lucide-react'
 import type { Student } from '@/types'
-import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
-import { useUser } from '@/hooks/user-user'
-import { isFriday } from '@/hooks/use-app-data'
+import { useAppData } from '@/hooks/use-app-data'
+import { useCreateConfiscationMutation } from '@/mutations'
 
-type ClassFormProps = {
+type ConfiscationFormProps = {
   closeDialog: () => void
 }
 
-function isToday(date: number) {
-  const d = new Date(date)
-  const now = new Date()
-  return (
-    d.getFullYear() === now.getFullYear() &&
-    d.getMonth() === now.getMonth() &&
-    d.getDate() === now.getDate()
-  )
-}
+const reasonsPreset = [
+  'Using device during class hours without permission',
+  'Using device in prohibited areas',
+  'Tampering with device settings',
+  'Unauthorized app usage',
+  'Disruptive behavior with device',
+  'Accessing inappropriate content',
+  'Using device for gaming during lessons',
+  'Using device to cheat during exams',
+  'Downloading unauthorized applications',
+]
 
-const StudentForm = ({ closeDialog }: ClassFormProps) => {
-  const { students, submissions, confiscations } = useAppData()
-  const user = useUser()
+const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
+  const { students } = useAppData()
   const [studentSearch, setStudentSearch] = useState<string | undefined>()
   const [showStudentDropdown, setShowStudentDropdown] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
@@ -55,41 +54,31 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
       )
     : students
 
-  const createSubmission = useCreateSubmissionMutation()
+  const createConfiscation = useCreateConfiscationMutation()
 
-  const submissionSchema = z.object({
+
+  const confiscationSchema = z.object({
     studentId: z.string().nonempty('Student is required'),
-    tabletCondition: z.enum(['Good', 'Bad'], {
-      required_error: 'Tablet condition is required',
-    }),
+    reason: z.string().nonempty('Reason is required'),
   })
 
-  const form = useForm<z.infer<typeof submissionSchema>>({
+  const form = useForm<z.infer<typeof confiscationSchema>>({
     defaultValues: {
       studentId: '',
-      tabletCondition: 'Good',
+      reason: reasonsPreset[5],
     },
-    resolver: zodResolver(submissionSchema),
+    resolver: zodResolver(confiscationSchema),
   })
 
-  // Check if selected student has already submitted today
-  const hasSubmittedToday = selectedStudent
-    ? submissions.some(
-        (s) => s.studentId === selectedStudent._id && isToday(s.submissionTime),
-      )
-    : false
-
-  const todayIsFriday = isFriday(new Date())
-
-  const handleSubmit = async (values: z.infer<typeof submissionSchema>) => {
+  const handleSubmit = async (values: z.infer<typeof confiscationSchema>) => {
     if (!selectedStudent) return
     const payload = {
       studentId: selectedStudent._id,
-      receivedById: user._id,
-      submissionTime: Date.now(),
-      condition: values.tabletCondition,
+      confiscationTime: Date.now(),
+      reason: values.reason,
     }
-    await createSubmission.mutateAsync({ entries: [payload] })
+    await createConfiscation.mutateAsync(payload)
+    closeDialog()
   }
 
   const handleStudentBlur = () => {
@@ -196,42 +185,33 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
                 This student does not have a tablet.
               </div>
             )}
-            {selectedStudent.tablet && hasSubmittedToday && (
-              <div className="flex items-center gap-2 mb-2 p-2 rounded bg-green-100 dark:bg-green-900/40 text-green-800 dark:text-green-200 text-xs font-semibold">
-                <CheckCircle2 className="w-4 h-4" />
-                This student has already submitted today.
-              </div>
-            )}
-            {isConfiscatedTablet(confiscations, selectedStudent) && (
+            {selectedStudent &&
+              selectedStudent.tablet &&
+              selectedStudent.tablet.status === 'confiscated' && (
                 <div className="flex items-center gap-2 p-2 rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold mb-4">
                   <User className="w-4 h-4" />
-                  This student's tablet has been confiscated
-                </div>
-              )}
-            {selectedStudent &&
-              selectedStudent.status === 'Boarder' &&
-              !todayIsFriday && (
-                <div className="flex items-center gap-2 mb-2 p-2 rounded bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-200 text-xs font-semibold">
-                  <User className="w-4 h-4" />
-                  Boarders can only submit on Friday.
+                  This student's tablet has already been confiscated
                 </div>
               )}
           </>
         )}
         <FormField
           control={form.control}
-          name="tabletCondition"
+          name="reason"
           render={({ field }) => (
-            <FormItem className='mt-4'>
-              <FormLabel>Tablet Condition</FormLabel>
+            <FormItem className="mt-4">
+              <FormLabel>Reason</FormLabel>
               <FormControl>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="h-10 w-full">
                     <SelectValue placeholder="Select condition" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Good">Good</SelectItem>
-                    <SelectItem value="Bad">Bad</SelectItem>
+                    {reasonsPreset.map((reason, index) => (
+                      <SelectItem key={index} value={reason}>
+                        {reason}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </FormControl>
@@ -244,27 +224,18 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
             type="submit"
             className="h-10"
             disabled={
-              createSubmission.isPending ||
-              !!hasSubmittedToday ||
               selectedStudent === null ||
-              !!(selectedStudent && !selectedStudent.tablet) ||
-              (selectedStudent && selectedStudent.tablet && selectedStudent.tablet.status === "confiscated") ||
-              (!!selectedStudent &&
-                selectedStudent.status === 'Boarder' &&
-                !todayIsFriday)
+              !!(selectedStudent && selectedStudent.tablet === null) ||
+              !!(
+                selectedStudent &&
+                selectedStudent.tablet &&
+                selectedStudent.tablet.status === 'confiscated'
+              ) || createConfiscation.isPending
             }
           >
             {selectedStudent && !selectedStudent.tablet
               ? 'No Tablet'
-              : hasSubmittedToday
-                ? 'Already Submitted'
-                : !!selectedStudent &&
-                    selectedStudent.status === 'Boarder' &&
-                    !todayIsFriday
-                  ? 'Boarders submit on Friday'
-                  : createSubmission.isPending
-                    ? 'Submitting...'
-                    : 'Submit Collection'}
+              : createConfiscation.isPending ? 'Confiscating...' : 'Confiscate Tablet'}
           </Button>
           <Button
             onClick={closeDialog}
@@ -280,4 +251,4 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
   )
 }
 
-export default StudentForm
+export default ConfiscationForm

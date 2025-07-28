@@ -19,7 +19,8 @@ export function DashboardStats() {
   const {
     students,
     tablets,
-    submissions
+    submissions,
+    confiscations
   } = useAppData()
 
   // Calculate real stats
@@ -27,7 +28,7 @@ export function DashboardStats() {
   const totalTablets = tablets.length
   const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
   const submittedToday = todaysSubmissions.length
-  const pendingSubmissions = getPendingSubmissionStudents(new Date(), students, submissions).length
+  const pendingSubmissions = getPendingSubmissionStudents(new Date(), students, submissions, confiscations).length
 
   const stats = [
     {

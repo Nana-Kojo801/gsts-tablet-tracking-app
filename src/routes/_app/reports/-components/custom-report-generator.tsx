@@ -51,7 +51,7 @@ export default function CustomReportGenerator({
   selectedStatus,
   setSelectedStatus,
 }: CustomReportGeneratorProps) {
-  const { classes, submissions, students } = useAppData()
+  const { classes, submissions, students, confiscations } = useAppData()
   const [calendarOpen, setCalendarOpen] = useState(false)
 
   const filteredStudents = students.filter(
@@ -64,6 +64,7 @@ export default function CustomReportGenerator({
     date,
     filteredStudents,
     submissions,
+    confiscations,
   )
 
   const handleExport = () => {

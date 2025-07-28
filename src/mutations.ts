@@ -187,6 +187,47 @@ export const useDeleteSubmissionMutation = () => {
   })
 }
 
+//Confiscations
+export const useCreateConfiscationMutation = () => {
+  return useMutation({
+    mutationFn: useConvexMutation(api.confiscations.create),
+    meta: {
+      successMessage: 'Confiscation created successfully',
+      errorMessage: 'Failed to create confiscation',
+    },
+  })
+}
+
+export const useUpdateConfiscationMutation = () => {
+  return useMutation({
+    mutationFn: useConvexMutation(api.confiscations.update),
+    meta: {
+      successMessage: 'Confiscation updated successfully',
+      errorMessage: 'Failed to update confiscation',
+    },
+  })
+}
+
+export const useReturnDeviceMutation = () => {
+  return useMutation({
+    mutationFn: useConvexMutation(api.confiscations.returnDevice),
+    meta: {
+      successMessage: 'Device returned successfully',
+      errorMessage: 'Failed to return device',
+    },
+  })
+}
+
+export const useClearAllConfiscationsMutation = () => {
+  return useMutation({
+    mutationFn: useConvexMutation(api.confiscations.removeAll),
+    meta: {
+      successMessage: 'All confiscations cleared successfully',
+      errorMessage: 'Failed to clear all confiscations',
+    },
+  })
+}
+
 export const useClearAllDataMutation = () => {
   return useMutation({
     mutationFn: useConvexMutation(api.data.clearAll),

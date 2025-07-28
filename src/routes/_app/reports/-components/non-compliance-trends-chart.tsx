@@ -10,14 +10,14 @@ interface NonComplianceTrendsChartProps {
 }
 
 export default function NonComplianceTrendsChart({ date, selectedClass, selectedStatus }: NonComplianceTrendsChartProps) {
-  const { students, submissions } = useAppData()
+  const { students, submissions, confiscations } = useAppData()
   // Filter students by class and status
   const filteredStudents = students.filter((s) =>
     (selectedClass === 'all' || s.class === selectedClass) &&
     (selectedStatus === 'all' || s.status === selectedStatus)
   )
 
-  const pending = getPendingSubmissionStudents(date, filteredStudents, submissions).length
+  const pending = getPendingSubmissionStudents(date, filteredStudents, submissions, confiscations).length
   const submitted = filteredStudents.length - pending
   const data = [
     { name: 'Submitted', value: submitted },

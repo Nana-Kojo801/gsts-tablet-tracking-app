@@ -1,16 +1,22 @@
-import { useAppData, getPendingSubmissionStudents } from "@/hooks/use-app-data"
-import { CheckCircle, Clock, AlertCircle, ShieldAlert } from "lucide-react"
+import {
+  useAppData,
+  getPendingSubmissionStudents,
+  isConfiscatedTablet,
+} from '@/hooks/use-app-data'
+import { CheckCircle, Clock, AlertCircle, ShieldAlert } from 'lucide-react'
 
 function isToday(date: number) {
   const d = new Date(date)
   const now = new Date()
-  return d.getFullYear() === now.getFullYear() &&
+  return (
+    d.getFullYear() === now.getFullYear() &&
     d.getMonth() === now.getMonth() &&
     d.getDate() === now.getDate()
+  )
 }
 
 const DashboardStats = () => {
-  const { submissions, tablets, students } = useAppData()
+  const { submissions, tablets, students, confiscations } = useAppData()
 
   // Today's submissions
   const todaysSubmissions = submissions.filter((s) => isToday(s.submissionTime))
@@ -19,41 +25,51 @@ const DashboardStats = () => {
   // Missing devices for today: submissions with condition === 'Missing'
   const missingDevices = tablets.filter((s) => s.status === 'lost').length
 
-  const confiscatedDevices = tablets.filter((t) => t.status === 'confiscated').length
+  const confiscatedDevices = tablets.filter((t) =>
+    isConfiscatedTablet(
+      confiscations,
+      students.find((s) => s.tablet?._id === t._id)!,
+    ),
+  ).length
 
   // Pending submissions for today: use school policy
-  const pendingCollections = getPendingSubmissionStudents(new Date(), students, submissions).length
+  const pendingCollections = getPendingSubmissionStudents(
+    new Date(),
+    students,
+    submissions,
+    confiscations
+  ).length
 
   const summaryStats = [
- {
-   label: "Submitted Today",
-   value: collectedToday,
-   icon: <CheckCircle className="w-6 h-6 text-green-600" />,
-   iconBg: "bg-green-500/10",
-   desc: "Tablets submitted today",
- },
- {
-   label: "Pending Submissions",
-   value: pendingCollections,
-   icon: <Clock className="w-6 h-6 text-yellow-600" />,
-   iconBg: "bg-yellow-500/10",
-   desc: "Awaiting return (today)",
- },
- {
-   label: "Missing Devices",
-   value: missingDevices,
-   icon: <AlertCircle className="w-6 h-6 text-red-600" />,
-   iconBg: "bg-red-500/10",
-   desc: "Marked as missing",
- },
- {
-   label: "Confiscated Devices",
-   value: confiscatedDevices,
-   icon: <ShieldAlert className="w-6 h-6 text-orange-600" />,
-   iconBg: "bg-orange-500/10",
-   desc: "Tablets confiscated",
- },
-]
+    {
+      label: 'Submitted Today',
+      value: collectedToday,
+      icon: <CheckCircle className="w-6 h-6 text-green-600" />,
+      iconBg: 'bg-green-500/10',
+      desc: 'Tablets submitted today',
+    },
+    {
+      label: 'Pending Submissions',
+      value: pendingCollections,
+      icon: <Clock className="w-6 h-6 text-yellow-600" />,
+      iconBg: 'bg-yellow-500/10',
+      desc: 'Awaiting return (today)',
+    },
+    {
+      label: 'Missing Devices',
+      value: missingDevices,
+      icon: <AlertCircle className="w-6 h-6 text-red-600" />,
+      iconBg: 'bg-red-500/10',
+      desc: 'Marked as missing',
+    },
+    {
+      label: 'Confiscated Devices',
+      value: confiscatedDevices,
+      icon: <ShieldAlert className="w-6 h-6 text-orange-600" />,
+      iconBg: 'bg-orange-500/10',
+      desc: 'Tablets confiscated',
+    },
+  ]
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {summaryStats.map((stat, idx) => (

@@ -5,13 +5,14 @@ import { query } from "./_generated/server"
 export const getAllData = query({
   handler: async (ctx) => {
     // Fetch all raw data in parallel
-    const [users, students, programmes, classes, tablets, submissions] = await Promise.all([
+    const [users, students, programmes, classes, tablets, submissions, confiscations] = await Promise.all([
       ctx.db.query("users").collect(),
       ctx.db.query("students").collect(),
       ctx.db.query("programmes").collect(),
       ctx.db.query("classes").collect(),
       ctx.db.query("tablets").collect(),
       ctx.db.query("submissions").collect(),
+      ctx.db.query("confiscations").collect()
     ])
 
     // Server-side computation - even faster!
@@ -52,13 +53,19 @@ export const getAllData = query({
       students: studentCountByClass.get(classEntry._id) || 0,
     }))
 
+    const processedConfiscations = confiscations.map(confiscation => ({
+      ...confiscation,
+      student: studentMap.get(confiscation.studentId)!,
+    }))
+
     return {
       users,
       students: processedStudents,
       programmes,
       classes: processedClasses,
       tablets,
-      submissions: processedSubmissions
+      submissions: processedSubmissions,
+      confiscations: processedConfiscations,
     }
   }
 })

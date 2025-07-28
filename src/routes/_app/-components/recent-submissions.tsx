@@ -20,7 +20,7 @@ const RecentSubmissions = () => {
         <h2 className="text-lg font-semibold text-foreground">
           Recent Submission
         </h2>
-        <Link to='/recent-submissions'>
+        <Link to='/submissions'>
           <Button variant="outline" size="sm">
             <Calendar className="w-4 h-4 mr-2" />
             View All

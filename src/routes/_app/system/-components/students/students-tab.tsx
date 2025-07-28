@@ -3,12 +3,12 @@ import type { Student } from '@/types'
 import type { DialogState } from './types'
 import StudentDialog from './student-dialog'
 import EntityTable from '@/components/entity-table/entity-table'
-import { useAppData } from '@/hooks/use-app-data'
+import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
 import { Badge } from '@/components/ui/badge'
 import { Ban, Tablet as TabletIcon } from 'lucide-react'
 
 const StudentsTab = () => {
-  const { students, programmes, classes } = useAppData()
+  const { students, programmes, classes, confiscations } = useAppData()
   const [dialogState, setDialogState] = useState<DialogState>({
     open: false,
     action: null,
@@ -42,7 +42,7 @@ const StudentsTab = () => {
         ]}
         renderData={({ column, entry, defaultData }) => {
           if (column.key === 'tablet') {
-            if (entry.tablet && entry.tablet.status === 'confiscated') {
+            if (entry.tablet && isConfiscatedTablet(confiscations, entry)) {
               return (
                 <Badge className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-semibold border bg-orange-500/10 border-orange-500 text-orange-700">
                   <Ban className="w-4 h-4 mr-1 text-orange-600" />
@@ -109,20 +109,20 @@ const StudentsTab = () => {
           tablet: {
             key: 'tablet',
             label: 'Tablet Status',
-            customValue: (student, received) =>
-              received === null
+            customValue: (student, value) =>
+              value === null
                 ? true
-                : received === true
-                  ? student.tablet
+                : value === 'received' && student.tabletId
+                  ? true
+                  : value === 'not received' && !student.tabletId
                     ? true
-                    : false
-                  : !student.tablet
-                    ? true
-                    : false,
+                    : value === 'confiscated' &&
+                      isConfiscatedTablet(confiscations, student),
             options: [
               { label: 'All Tablets', value: null },
-              { label: 'Received', value: true },
-              { label: 'Not Received', value: false },
+              { label: 'Received', value: 'received' },
+              { label: 'Not Received', value: 'not received' },
+              { label: 'Confiscated', value: 'confiscated' },
             ],
           },
         }}

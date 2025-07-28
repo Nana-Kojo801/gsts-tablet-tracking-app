@@ -1,4 +1,4 @@
-import type { Student, Submissions } from '@/types'
+import type { Confiscation, Student, Submissions } from '@/types'
 import { convexQuery } from '@convex-dev/react-query'
 import { api } from '@convex/_generated/api'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -16,6 +16,7 @@ export function getPendingSubmissionStudents(
   date: Date,
   students: Student[],
   submissions: Submissions[],
+  confiscations: Confiscation[],
 ) {
   const isFri = isFriday(date)
   const dateStr = date.toISOString().slice(0, 10)
@@ -23,7 +24,7 @@ export function getPendingSubmissionStudents(
   return students.filter((s) => {
     if (isWeekend(date)) return false // Skip weekends
     if (!isFri && s.status === 'Boarder') return false
-    if(!s.tablet || (s.tablet && s.tablet.status === "confiscated")) return false
+    if(!s.tablet || (s.tablet && isConfiscatedTablet(confiscations, s))) return false
     const hasSubmitted = submissions.some(
       (sub) =>
         sub.studentId === s._id &&
@@ -31,6 +32,10 @@ export function getPendingSubmissionStudents(
     )
     return !hasSubmitted
   })
+}
+
+export function isConfiscatedTablet(confiscations: Confiscation[], student: Student) {
+  return confiscations.some(c => c.studentId === student._id && c.status === 'confiscated')
 }
 
 export const useAppData = () => {
