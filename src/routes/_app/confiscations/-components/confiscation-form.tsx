@@ -10,6 +10,7 @@ import {
   Form,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectTrigger,
@@ -38,6 +39,7 @@ const reasonsPreset = [
   'Using device for gaming during lessons',
   'Using device to cheat during exams',
   'Downloading unauthorized applications',
+  'Custom', // Added custom option
 ]
 
 const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
@@ -59,22 +61,40 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
   const confiscationSchema = z.object({
     studentId: z.string().nonempty('Student is required'),
     reason: z.string().nonempty('Reason is required'),
+    customReason: z.string().optional(),
+  }).refine((data) => {
+    // If reason is "Custom", customReason must be provided
+    if (data.reason === 'Custom') {
+      return data.customReason && data.customReason.trim().length > 0
+    }
+    return true
+  }, {
+    message: 'Custom reason is required when "Custom" is selected',
+    path: ['customReason']
   })
 
   const form = useForm<z.infer<typeof confiscationSchema>>({
     defaultValues: {
       studentId: '',
       reason: reasonsPreset[5],
+      customReason: '',
     },
     resolver: zodResolver(confiscationSchema),
   })
 
+  const selectedReason = form.watch('reason')
+  const isCustomReason = selectedReason === 'Custom'
+
   const handleSubmit = async (values: z.infer<typeof confiscationSchema>) => {
     if (!selectedStudent) return
+    
+    // Use custom reason if "Custom" is selected, otherwise use the preset reason
+    const finalReason = values.reason === 'Custom' ? values.customReason : values.reason
+    
     const payload = {
       studentId: selectedStudent._id,
       confiscationTime: Date.now(),
-      reason: values.reason,
+      reason: finalReason as string,
     }
     await createConfiscation.mutateAsync(payload)
     closeDialog()
@@ -199,9 +219,18 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
             <FormItem className="mt-4">
               <FormLabel>Reason</FormLabel>
               <FormControl>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select 
+                  value={field.value} 
+                  onValueChange={(value) => {
+                    field.onChange(value)
+                    // Clear custom reason when switching away from Custom
+                    if (value !== 'Custom') {
+                      form.setValue('customReason', '')
+                    }
+                  }}
+                >
                   <SelectTrigger className="h-10 w-full">
-                    <SelectValue placeholder="Select condition" />
+                    <SelectValue placeholder="Select reason" />
                   </SelectTrigger>
                   <SelectContent>
                     {reasonsPreset.map((reason, index) => (
@@ -216,6 +245,28 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
             </FormItem>
           )}
         />
+        
+        {/* Custom reason textarea - only shown when "Custom" is selected */}
+        {isCustomReason && (
+          <FormField
+            control={form.control}
+            name="customReason"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Custom Reason</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Enter your custom reason for confiscation..."
+                    className="min-h-[80px] resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
         <div className="w-full grid grid-cols-2 gap-3">
           <Button
             type="submit"
