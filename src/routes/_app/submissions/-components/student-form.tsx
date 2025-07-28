@@ -248,7 +248,7 @@ const StudentForm = ({ closeDialog }: ClassFormProps) => {
               !!hasSubmittedToday ||
               selectedStudent === null ||
               !!(selectedStudent && !selectedStudent.tablet) ||
-              (selectedStudent && selectedStudent.tablet && selectedStudent.tablet.status === "confiscated") ||
+              isConfiscatedTablet(confiscations, selectedStudent) ||
               (!!selectedStudent &&
                 selectedStudent.status === 'Boarder' &&
                 !todayIsFriday)

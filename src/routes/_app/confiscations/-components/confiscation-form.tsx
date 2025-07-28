@@ -21,7 +21,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/components/ui/button'
 import { Search, User } from 'lucide-react'
 import type { Student } from '@/types'
-import { useAppData } from '@/hooks/use-app-data'
+import { isConfiscatedTablet, useAppData } from '@/hooks/use-app-data'
 import { useCreateConfiscationMutation } from '@/mutations'
 
 type ConfiscationFormProps = {
@@ -41,7 +41,7 @@ const reasonsPreset = [
 ]
 
 const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
-  const { students } = useAppData()
+  const { students, confiscations } = useAppData()
   const [studentSearch, setStudentSearch] = useState<string | undefined>()
   const [showStudentDropdown, setShowStudentDropdown] = useState(false)
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null)
@@ -55,7 +55,6 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
     : students
 
   const createConfiscation = useCreateConfiscationMutation()
-
 
   const confiscationSchema = z.object({
     studentId: z.string().nonempty('Student is required'),
@@ -185,14 +184,12 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
                 This student does not have a tablet.
               </div>
             )}
-            {selectedStudent &&
-              selectedStudent.tablet &&
-              selectedStudent.tablet.status === 'confiscated' && (
-                <div className="flex items-center gap-2 p-2 rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold mb-4">
-                  <User className="w-4 h-4" />
-                  This student's tablet has already been confiscated
-                </div>
-              )}
+            {isConfiscatedTablet(confiscations, selectedStudent) && (
+              <div className="flex items-center gap-2 p-2 rounded bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-200 text-xs font-semibold mb-4">
+                <User className="w-4 h-4" />
+                This student's tablet has already been confiscated
+              </div>
+            )}
           </>
         )}
         <FormField
@@ -226,16 +223,15 @@ const ConfiscationForm = ({ closeDialog }: ConfiscationFormProps) => {
             disabled={
               selectedStudent === null ||
               !!(selectedStudent && selectedStudent.tablet === null) ||
-              !!(
-                selectedStudent &&
-                selectedStudent.tablet &&
-                selectedStudent.tablet.status === 'confiscated'
-              ) || createConfiscation.isPending
+              isConfiscatedTablet(confiscations, selectedStudent) ||
+              createConfiscation.isPending
             }
           >
             {selectedStudent && !selectedStudent.tablet
               ? 'No Tablet'
-              : createConfiscation.isPending ? 'Confiscating...' : 'Confiscate Tablet'}
+              : createConfiscation.isPending
+                ? 'Confiscating...'
+                : 'Confiscate Tablet'}
           </Button>
           <Button
             onClick={closeDialog}
