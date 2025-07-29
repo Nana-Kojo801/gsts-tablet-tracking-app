@@ -77,7 +77,7 @@ const ClassForm = ({ closeDialog }: ClassFormProps) => {
 
   // For each student with a tablet, check if they have submitted today
   const studentsWhoHaveNotSubmitted = studentsWithTablet
-    .filter((s) => s.tablet && isConfiscatedTablet(confiscations, s))
+    .filter((s) => s.tablet && !isConfiscatedTablet(confiscations, s))
     .filter(
       (student) =>
         !submissions.some(
