@@ -34,7 +34,7 @@ const ConsficationItem = ({
       // Clear error and update confiscation
       setReasonError('')
       updateConfiscation.mutate({
-        confiscationId: confiscation._id,
+        id: confiscation._id,
         reason: editedReason.trim(),
       })
       setIsEditingReason(false)
