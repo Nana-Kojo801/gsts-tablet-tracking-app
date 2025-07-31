@@ -1,9 +1,11 @@
 import Spinner from '@/components/spinner'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useReturnDeviceMutation } from '@/mutations'
+import { useDeleteConfiscationMutation, useReturnDeviceMutation, useUpdateConfiscationMutation } from '@/mutations'
 import type { Confiscation } from '@/types'
-import { RotateCcw, Ban } from 'lucide-react'
+import { RotateCcw, Ban, X, Edit, Check, Trash } from 'lucide-react'
+
+import { useState } from 'react'
 
 const ConsficationItem = ({
   confiscation,
@@ -13,6 +15,49 @@ const ConsficationItem = ({
   idx: number
 }) => {
   const returnDevice = useReturnDeviceMutation()
+  const updateConfiscation = useUpdateConfiscationMutation()
+  const deleteConfiscation = useDeleteConfiscationMutation()
+  
+  // State for editing reason
+  const [isEditingReason, setIsEditingReason] = useState(false)
+  const [editedReason, setEditedReason] = useState(confiscation.reason)
+  const [reasonError, setReasonError] = useState('')
+
+  const handleEditReason = () => {
+    if (isEditingReason) {
+      // Validate reason
+      if (!editedReason.trim()) {
+        setReasonError('Reason cannot be empty')
+        return
+      }
+      
+      // Clear error and update confiscation
+      setReasonError('')
+      updateConfiscation.mutate({
+        confiscationId: confiscation._id,
+        reason: editedReason.trim(),
+      })
+      setIsEditingReason(false)
+    } else {
+      setIsEditingReason(true)
+      setEditedReason(confiscation.reason)
+      setReasonError('')
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditingReason(false)
+    setEditedReason(confiscation.reason)
+    setReasonError('')
+  }
+
+  const handleReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedReason(e.target.value)
+    if (reasonError && e.target.value.trim()) {
+      setReasonError('')
+    }
+  }
+
   return (
     <div
       key={confiscation._id}
@@ -39,7 +84,7 @@ const ConsficationItem = ({
               </Badge>
             </div>
           </div>
-
+          
           <div className="flex items-center gap-2">
             <Badge
               className={`px-2 py-0.5 text-xs rounded-md ${
@@ -52,7 +97,7 @@ const ConsficationItem = ({
                 ? 'Confiscated'
                 : 'Returned'}
             </Badge>
-
+            
             {confiscation.status === 'confiscated' && (
               <Button
                 size="sm"
@@ -75,9 +120,34 @@ const ConsficationItem = ({
                 )}
               </Button>
             )}
+            
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                deleteConfiscation.mutate({
+                  confiscationId: confiscation._id,
+                })
+              }
+              disabled={confiscation.status !== 'returned' || deleteConfiscation.isPending}
+              className={`px-3 py-1.5 ${
+                confiscation.status === 'returned'
+                  ? 'text-red-600 dark:text-red-400 border-red-300 dark:border-red-800 hover:bg-red-50 dark:hover:bg-red-950/30'
+                  : 'text-muted-foreground border-muted cursor-not-allowed'
+              }`}
+            >
+              {deleteConfiscation.isPending ? (
+                <Spinner className="h-3 w-3" />
+              ) : (
+                <>
+                  <Trash className="h-3 w-3 mr-1.5" />
+                  Delete
+                </>
+              )}
+            </Button>
           </div>
         </div>
-
+        
         {/* Middle section - device info */}
         <div className="mt-2 flex items-center gap-4 text-sm">
           <div>
@@ -93,13 +163,71 @@ const ConsficationItem = ({
             </span>
           </div>
         </div>
-
-        {/* Bottom section - reason */}
+        
+        {/* Bottom section - reason with edit functionality */}
         <div className="mt-2 pt-2 border-t border-border/20">
-          <p className="text-sm">
-            <span className="text-muted-foreground">Reason:</span>
-            <span className="ml-1.5">{confiscation.reason}</span>
-          </p>
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1">
+              <span className="text-muted-foreground text-sm">Reason:</span>
+              {isEditingReason ? (
+                <div className="mt-1">
+                  <input
+                    type="text"
+                    value={editedReason}
+                    onChange={handleReasonChange}
+                    className={`w-full px-2 py-1 text-sm border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 ${
+                      reasonError 
+                        ? 'border-red-500 focus:ring-red-500/50' 
+                        : 'border-border'
+                    }`}
+                    placeholder="Enter reason for confiscation"
+                    autoFocus
+                  />
+                  {reasonError && (
+                    <p className="text-xs text-red-500 mt-1">{reasonError}</p>
+                  )}
+                </div>
+              ) : (
+                <span className="ml-1.5 text-sm">{confiscation.reason}</span>
+              )}
+            </div>
+            
+            <div className="flex items-center gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleEditReason}
+                className="h-6 px-2 text-xs hover:bg-muted"
+                disabled={updateConfiscation.isPending}
+              >
+                {updateConfiscation.isPending ? (
+                  <Spinner className="h-3 w-3" />
+                ) : isEditingReason ? (
+                  <>
+                    <Check className="h-3 w-3 mr-1" />
+                    Save
+                  </>
+                ) : (
+                  <>
+                    <Edit className="h-3 w-3 mr-1" />
+                    Edit
+                  </>
+                )}
+              </Button>
+              
+              {isEditingReason && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleCancelEdit}
+                  className="h-6 px-2 text-xs hover:bg-muted text-muted-foreground"
+                >
+                  <X className="h-3 w-3 mr-1" />
+                  Cancel
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>

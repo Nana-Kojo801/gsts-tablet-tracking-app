@@ -208,6 +208,16 @@ export const useUpdateConfiscationMutation = () => {
   })
 }
 
+export const useDeleteConfiscationMutation = () => {
+  return useMutation({
+    mutationFn: useConvexMutation(api.confiscations.remove),
+    meta: {
+      successMessage: 'Confiscation deleted successfully',
+      errorMessage: 'Failed to delete confiscation',
+    },
+  })
+}
+
 export const useReturnDeviceMutation = () => {
   return useMutation({
     mutationFn: useConvexMutation(api.confiscations.returnDevice),
