@@ -126,7 +126,7 @@ const ConsficationItem = ({
               variant="outline"
               onClick={() =>
                 deleteConfiscation.mutate({
-                  confiscationId: confiscation._id,
+                  id: confiscation._id,
                 })
               }
               disabled={confiscation.status !== 'returned' || deleteConfiscation.isPending}
