@@ -7,7 +7,7 @@ import DashboardStats from './-components/dashboard-stats'
 import ConfiscationsList from './-components/confiscations-list'
 import { useAppData } from '@/hooks/use-app-data'
 import CreateConfiscationDialog from './-components/create-confiscation-dialog'
-import { useClearAllConfiscationsMutation } from '@/mutations'
+import { useClearAllReturnedConfiscationsMutation } from '@/mutations'
 
 export const Route = createFileRoute('/_app/confiscations/')({
   component: ConfiscationsPage,
@@ -18,7 +18,7 @@ function ConfiscationsPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [showCreateDialog, setShowCreateDialog] = useState(false)
 
-  const clearAllConfiscations = useClearAllConfiscationsMutation()
+  const clearAllConfiscations = useClearAllReturnedConfiscationsMutation()
 
   const filteredConfiscations = useMemo(
     () =>
@@ -72,12 +72,21 @@ function ConfiscationsPage() {
             <Button
               variant="outline"
               className="flex items-center space-x-2"
+              disabled={
+                clearAllConfiscations.isPending ||
+                confiscations.filter((c) => c.status === 'returned').length ===
+                  0
+              }
               onClick={async () => {
                 await clearAllConfiscations.mutateAsync({})
               }}
             >
               <Trash2 className="size-4" />
-              <span>{clearAllConfiscations.isPending ? 'Clearing...' : 'Clear All'}</span>
+              <span>
+                {clearAllConfiscations.isPending
+                  ? 'Clearing...'
+                  : 'Clear All Returned'}
+              </span>
             </Button>
             <Button
               className="flex items-center space-x-2"

@@ -65,6 +65,18 @@ export const bulkRemove = mutation({
   },
 })
 
+export const clearAllReturned = mutation({
+  handler: async (ctx) => {
+    const returnedConfiscations = await ctx.db
+      .query('confiscations')
+      .filter((q) => q.eq(q.field('status'), 'returned'))
+      .collect()
+    await Promise.all(
+      returnedConfiscations.map(async (c) => await ctx.db.delete(c._id)),
+    )
+  }
+})
+
 export const removeAll = mutation({
   handler: async (ctx) => {
     const confiscations = await ctx.db.query('confiscations').collect()

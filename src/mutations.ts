@@ -228,12 +228,12 @@ export const useReturnDeviceMutation = () => {
   })
 }
 
-export const useClearAllConfiscationsMutation = () => {
+export const useClearAllReturnedConfiscationsMutation = () => {
   return useMutation({
-    mutationFn: useConvexMutation(api.confiscations.removeAll),
+    mutationFn: useConvexMutation(api.confiscations.clearAllReturned),
     meta: {
-      successMessage: 'All confiscations cleared successfully',
-      errorMessage: 'Failed to clear all confiscations',
+      successMessage: 'All returned confiscations cleared successfully',
+      errorMessage: 'Failed to clear all returned confiscations',
     },
   })
 }

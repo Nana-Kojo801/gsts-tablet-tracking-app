@@ -12,7 +12,7 @@ export const getAllData = query({
       ctx.db.query("classes").collect(),
       ctx.db.query("tablets").collect(),
       ctx.db.query("submissions").collect(),
-      ctx.db.query("confiscations").collect()
+      ctx.db.query("confiscations").order("desc").collect()
     ])
 
     // Server-side computation - even faster!
