@@ -39,6 +39,6 @@ export function isConfiscatedTablet(confiscations: Confiscation[], student: Stud
 }
 
 export const useAppData = () => {
-  const { data } = useSuspenseQuery(convexQuery(api.data.getAllData, {}))
+  const { data } = useSuspenseQuery({ ...convexQuery(api.data.getAllData, {}), gcTime: 1000 * 60 * 5 })
   return data
 }

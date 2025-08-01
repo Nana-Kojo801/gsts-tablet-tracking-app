@@ -1,6 +1,6 @@
 import { defineTable } from "convex/server";
 import { v } from "convex/values";
-import { userStatus } from "../../shared/validators";
+import { userStatus } from "../shared/validators";
 
 export const studentTable = defineTable({
     name: v.string(),

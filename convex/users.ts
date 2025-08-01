@@ -1,7 +1,7 @@
 import { v } from 'convex/values'
 import { mutation, query } from './_generated/server'
 import { userRoles } from './shared/validators'
-import { generateUserPassword, getUserByUsername } from './models/users/helpers'
+import { generateUserPassword, getUserByUsername } from './models/user'
 
 export const getAll = query({
   handler: async (ctx) => {

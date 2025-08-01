@@ -15,7 +15,7 @@ export const Route = createFileRoute('/_app')({
     if (!context.user) throw redirect({ to: '/login' })
   },
   loader: async ({ context: { queryClient } }) => {
-    await queryClient.ensureQueryData(convexQuery(api.data.getAllData, {}))
+    await queryClient.ensureQueryData({ ...convexQuery(api.data.getAllData, {}), gcTime: 1000 * 60 * 5 })
   },
 })
 

@@ -18,6 +18,7 @@ import { Route as AppStudentsIndexRouteImport } from './routes/_app/students/ind
 import { Route as AppSettingsIndexRouteImport } from './routes/_app/settings/index'
 import { Route as AppReportsIndexRouteImport } from './routes/_app/reports/index'
 import { Route as AppConfiscationsIndexRouteImport } from './routes/_app/confiscations/index'
+import { Route as AppConfiscationsAllIndexRouteImport } from './routes/_app/confiscations/all/index'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -63,6 +64,12 @@ const AppConfiscationsIndexRoute = AppConfiscationsIndexRouteImport.update({
   path: '/confiscations/',
   getParentRoute: () => AppRoute,
 } as any)
+const AppConfiscationsAllIndexRoute =
+  AppConfiscationsAllIndexRouteImport.update({
+    id: '/confiscations/all/',
+    path: '/confiscations/all/',
+    getParentRoute: () => AppRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/students': typeof AppStudentsIndexRoute
   '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
+  '/confiscations/all': typeof AppConfiscationsAllIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/students': typeof AppStudentsIndexRoute
   '/submissions': typeof AppSubmissionsIndexRoute
   '/system': typeof AppSystemIndexRoute
+  '/confiscations/all': typeof AppConfiscationsAllIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_app/students/': typeof AppStudentsIndexRoute
   '/_app/submissions/': typeof AppSubmissionsIndexRoute
   '/_app/system/': typeof AppSystemIndexRoute
+  '/_app/confiscations/all/': typeof AppConfiscationsAllIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/students'
     | '/submissions'
     | '/system'
+    | '/confiscations/all'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/students'
     | '/submissions'
     | '/system'
+    | '/confiscations/all'
   id:
     | '__root__'
     | '/_app'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_app/students/'
     | '/_app/submissions/'
     | '/_app/system/'
+    | '/_app/confiscations/all/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppConfiscationsIndexRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/confiscations/all/': {
+      id: '/_app/confiscations/all/'
+      path: '/confiscations/all'
+      fullPath: '/confiscations/all'
+      preLoaderRoute: typeof AppConfiscationsAllIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -211,6 +231,7 @@ interface AppRouteChildren {
   AppStudentsIndexRoute: typeof AppStudentsIndexRoute
   AppSubmissionsIndexRoute: typeof AppSubmissionsIndexRoute
   AppSystemIndexRoute: typeof AppSystemIndexRoute
+  AppConfiscationsAllIndexRoute: typeof AppConfiscationsAllIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -221,6 +242,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppStudentsIndexRoute: AppStudentsIndexRoute,
   AppSubmissionsIndexRoute: AppSubmissionsIndexRoute,
   AppSystemIndexRoute: AppSystemIndexRoute,
+  AppConfiscationsAllIndexRoute: AppConfiscationsAllIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

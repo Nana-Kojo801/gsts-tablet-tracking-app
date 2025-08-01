@@ -1,6 +1,6 @@
 import { Button } from '../ui/button'
 import { Edit, Trash2 } from 'lucide-react'
-import type { EntityTableProps, RenderDataType } from './entity-table'
+import type { EntityTableProps, RenderDataType } from './types'
 
 type DataTableProps<T, IdType = unknown> = {
   entries: T[]

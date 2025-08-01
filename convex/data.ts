@@ -1,3 +1,4 @@
+import { Id } from "./_generated/dataModel";
 import { mutation } from "./_generated/server";
 
 import { query } from "./_generated/server"
@@ -42,7 +43,7 @@ export const getAllData = query({
       return { ...submission, student, receivedBy }
     })
 
-    const studentCountByClass = new Map()
+    const studentCountByClass = new Map<Id<"classes">, number>()
     processedStudents.forEach(student => {
       const count = studentCountByClass.get(student.classId) || 0
       studentCountByClass.set(student.classId, count + 1)
@@ -53,9 +54,16 @@ export const getAllData = query({
       students: studentCountByClass.get(classEntry._id) || 0,
     }))
 
+    const confiscationHistoryCount = new Map<Id<"students">, number>()
+    confiscations.forEach(confiscation => {
+      const count = confiscationHistoryCount.get(confiscation.studentId) || 0
+      confiscationHistoryCount.set(confiscation.studentId, count + 1)
+    })
+
     const processedConfiscations = confiscations.map(confiscation => ({
       ...confiscation,
       student: studentMap.get(confiscation.studentId)!,
+      history: confiscationHistoryCount.get(confiscation.studentId) || 0
     }))
 
     return {
