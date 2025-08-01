@@ -21,14 +21,14 @@ function ConfiscationsPage() {
     () =>
       confiscations.filter(
         (c) =>
-          (c.status === 'confiscated' &&
-            c.student.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
-          c.student.indexNumber
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          c.student.tablet?.imei
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()),
+          c.status === 'confiscated' &&
+          (c.student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.student.indexNumber
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            c.student.tablet?.imei
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())),
       ),
     [searchTerm, confiscations],
   )
