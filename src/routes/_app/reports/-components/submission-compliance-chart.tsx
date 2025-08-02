@@ -14,6 +14,7 @@ export default function TabletConditionAnalyticsChart({ date, selectedClass, sel
   const { students, submissions } = useAppData()
   // Filter students by class and status
   const filteredStudents = students.filter((s) =>
+    s.tablet &&
     (selectedClass === 'all' || s.class === selectedClass) &&
     (selectedStatus === 'all' || s.status === selectedStatus)
   )
