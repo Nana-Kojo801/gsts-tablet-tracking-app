@@ -313,7 +313,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                                 field.value === t._id 
                                   ? 'bg-primary/10 font-semibold text-primary' 
                                   : isOwnedByDifferentStudent
-                                    ? 'opacity-50 cursor-not-allowed bg-red-50 hover:bg-red-50'
+                                    ? 'opacity-60 cursor-not-allowed bg-red-50 dark:bg-red-950/30 hover:bg-red-50 dark:hover:bg-red-950/30'
                                     : 'hover:bg-primary/5'
                               }`}
                               onMouseDown={() => {
@@ -327,7 +327,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                               <Tablet className="w-3.5 h-3.5 text-muted-foreground" />
                               <span className="tracking-wider">{t.imei}</span>
                               {isOwnedByDifferentStudent && (
-                                <span className="text-red-600 font-medium">(Owned by another student)</span>
+                                <span className="text-red-600 dark:text-red-400 font-medium">(Owned by another student)</span>
                               )}
                             </div>
                           )
