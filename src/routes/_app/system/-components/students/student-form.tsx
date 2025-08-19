@@ -32,7 +32,7 @@ interface StudentFormProps {
 }
 
 const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
-  const { classes, programmes, tablets } = useAppData()
+  const { classes, programmes, tablets, students } = useAppData()
 
   // For tablet autocomplete
   const initialTabletImei = useMemo(() => {
@@ -65,8 +65,18 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
     tabletId: z
       .string()
       .optional()
-      .refine((val) => !val || tablets.some((t: any) => t._id === val), {
+      .refine((val) => !val || tablets.some((t) => t._id === val), {
         message: 'Please select a valid tablet from the list',
+      })
+      .refine((val) => {
+        if (!val) return true // No tablet selected is fine
+        // Check if tablet is owned by a different student
+        const isOwnedByDifferentStudent = students.some(
+          (s) => s.tabletId === val && s._id !== studentObj?._id
+        )
+        return !isOwnedByDifferentStudent
+      }, {
+        message: 'This tablet is already assigned to another student',
       }) as z.ZodType<Id<'tablets'> | undefined>,
   })
 
@@ -127,6 +137,13 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
     }
     setShowTabletDropdown(false)
   }
+
+  // Check if form is valid and tablet is not owned by another student
+  const isFormValid = form.formState.isValid
+  const selectedTabletId = form.watch('tabletId')
+  const isTabletOwnedByOther = selectedTabletId && students.some(
+    (s) => s.tabletId === selectedTabletId && s._id !== studentObj?._id
+  )
 
   return (
     <Form {...form}>
@@ -285,20 +302,36 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
                           No tablets found
                         </div>
                       ) : (
-                        matchingTablets.map((t: any) => (
-                          <div
-                            key={t._id}
-                            className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-colors rounded-lg text-xs mb-0.5 ${field.value === t._id ? 'bg-primary/10 font-semibold text-primary' : 'hover:bg-primary/5'}`}
-                            onMouseDown={() => {
-                              field.onChange(t._id)
-                              setTabletSearch(t.imei)
-                              setShowTabletDropdown(false)
-                            }}
-                          >
-                            <Tablet className="w-3.5 h-3.5 text-muted-foreground" />
-                            <span className="tracking-wider">{t.imei}</span>
-                          </div>
-                        ))
+                        matchingTablets.map((t) => {
+                          const isOwnedByDifferentStudent = students.some(
+                            (s) => s.tabletId === t._id && s._id !== studentObj?._id
+                          )
+                          return (
+                            <div
+                              key={t._id}
+                              className={`flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-colors rounded-lg text-xs mb-0.5 ${
+                                field.value === t._id 
+                                  ? 'bg-primary/10 font-semibold text-primary' 
+                                  : isOwnedByDifferentStudent
+                                    ? 'opacity-50 cursor-not-allowed bg-red-50 hover:bg-red-50'
+                                    : 'hover:bg-primary/5'
+                              }`}
+                              onMouseDown={() => {
+                                if (!isOwnedByDifferentStudent) {
+                                  field.onChange(t._id)
+                                  setTabletSearch(t.imei)
+                                  setShowTabletDropdown(false)
+                                }
+                              }}
+                            >
+                              <Tablet className="w-3.5 h-3.5 text-muted-foreground" />
+                              <span className="tracking-wider">{t.imei}</span>
+                              {isOwnedByDifferentStudent && (
+                                <span className="text-red-600 font-medium">(Owned by another student)</span>
+                              )}
+                            </div>
+                          )
+                        })
                       )}
                     </div>
                   )}
@@ -311,7 +344,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
         <div className="w-full grid grid-cols-2 gap-3">
           {type === 'add' && (
             <Button
-              disabled={createStudent.isPending}
+              disabled={createStudent.isPending || !isFormValid || isTabletOwnedByOther}
               type="submit"
               className="h-10"
             >
@@ -320,7 +353,7 @@ const StudentForm = ({ closeDialog, type, studentObj }: StudentFormProps) => {
           )}
           {type === 'edit' && studentObj && (
             <Button
-              disabled={editStudent.isPending}
+              disabled={editStudent.isPending || !isFormValid || isTabletOwnedByOther}
               type="submit"
               className="h-10"
             >
